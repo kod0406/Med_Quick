@@ -16,6 +16,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var placeholder: TextView
     private lateinit var medicineDAO: MedicineDAO
+    private lateinit var interactionAdapter: ExtendedArrayAdapter<String>
+    private lateinit var interactionListView: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +54,11 @@ class MainActivity : AppCompatActivity() {
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         medicineListView.adapter = adapter
 
+        // Initialize interaction ListView and Adapter
+        interactionListView = findViewById(R.id.interactionListView)
+        interactionAdapter = ExtendedArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
+        interactionListView.adapter = interactionAdapter
+
         // Initialize MedicineDAO
         medicineDAO = MedicineDAO(this)
 
@@ -62,12 +69,16 @@ class MainActivity : AppCompatActivity() {
             val medicineName = parent.getItemAtPosition(position) as String
             showDeleteConfirmationDialog(medicineName, position)
         }
+
+        // Check drug interactions initially
+        checkDrugInteractions()
     }
 
     override fun onResume() {
         super.onResume()
         // Reload data when the activity is resumed
         loadSavedMedicines()
+        checkDrugInteractions()
     }
 
     private fun loadSavedMedicines() {
@@ -105,6 +116,9 @@ class MainActivity : AppCompatActivity() {
 
         // Update placeholder visibility
         updatePlaceholderVisibility()
+
+        // Check drug interactions again after deletion
+        checkDrugInteractions()
     }
 
     private fun updatePlaceholderVisibility() {
@@ -112,6 +126,41 @@ class MainActivity : AppCompatActivity() {
             placeholder.visibility = TextView.VISIBLE
         } else {
             placeholder.visibility = TextView.GONE
+        }
+    }
+
+    private fun checkDrugInteractions() {
+        interactionAdapter.clear()
+        val medicines = medicineDAO.getAllMedicines()
+
+        // 중복 확인을 위한 HashSet 생성
+        val interactionSet = mutableSetOf<Pair<String, String>>()
+
+        val checker = DrugInteractionChecker(this)
+        checker.checkInteractions { interactions, noInteractionMeds ->
+            interactions.forEach { interaction ->
+                val sortedPair = if (interaction.medicine1 < interaction.medicine2) {
+                    Pair(interaction.medicine1, interaction.medicine2)
+                } else {
+                    Pair(interaction.medicine2, interaction.medicine1)
+                }
+
+                if (!interactionSet.contains(sortedPair)) {
+                    interactionAdapter.add("${interaction.medicine1}과(와) ${interaction.medicine2}은 같이 드시면 안됩니다. 사유: ${interaction.reason}")
+                    interactionSet.add(sortedPair)
+                }
+            }
+
+            if (interactions.isEmpty()) {
+                interactionAdapter.add("문제 없음")
+            }
+
+            // 중복된 항목 제거
+            val uniqueList = interactionAdapter.getItems().distinct()
+            interactionAdapter.clear()
+            interactionAdapter.addAll(uniqueList)
+
+            interactionAdapter.notifyDataSetChanged()
         }
     }
 }

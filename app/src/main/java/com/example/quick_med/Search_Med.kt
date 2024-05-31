@@ -108,7 +108,6 @@ class Search_Med : AppCompatActivity() {
             } catch (e: Exception) {
                 e.printStackTrace()
                 runOnUiThread {
-                    Toast.makeText(this@Search_Med, "기본 API 호출에 실패했습니다: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             } finally {
                 onComplete()
@@ -145,7 +144,6 @@ class Search_Med : AppCompatActivity() {
             } catch (e: Exception) {
                 e.printStackTrace()
                 runOnUiThread {
-                    Toast.makeText(this@Search_Med, "추가 API 호출에 실패했습니다: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             } finally {
                 onComplete()
