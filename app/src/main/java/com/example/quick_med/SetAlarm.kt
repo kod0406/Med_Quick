@@ -1,7 +1,9 @@
 package com.example.quick_med
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -11,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.widget.TextView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -48,6 +52,32 @@ class SetAlarm : AppCompatActivity() {
         button.setOnClickListener {
             val intent = Intent(this, SetAlarm_Add::class.java)
             startActivityForResult(intent, REQUEST_CODE) // 알람 설정 화면으로 이동
+        }
+
+        // 저장된 알람 불러오기
+        loadAlarms()
+    }
+
+    private fun loadAlarms() {
+        val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
+        val alarmList = getAlarmList(sharedPreferences)
+
+        for (alarmData in alarmList) {
+            val amPm = if (alarmData.hour >= 12) "PM" else "AM"
+            val displayHour = if (alarmData.hour > 12) alarmData.hour - 12 else if (alarmData.hour == 0) 12 else alarmData.hour
+            val displayMinute = String.format("%02d", alarmData.minute)
+            val time = "$amPm $displayHour:$displayMinute"
+            addAlarmToList(alarmData.name, time)
+        }
+    }
+
+    private fun getAlarmList(sharedPreferences: SharedPreferences): MutableList<AlarmData> {
+        val json = sharedPreferences.getString("ALARM_LIST", null)
+        return if (json != null) {
+            val type = object : TypeToken<MutableList<AlarmData>>() {}.type
+            Gson().fromJson(json, type)
+        } else {
+            mutableListOf()
         }
     }
 

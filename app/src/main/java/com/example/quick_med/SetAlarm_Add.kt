@@ -5,13 +5,19 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.util.Calendar
+
+// AlarmData 클래스를 별도의 파일에서 가져옵니다.
+import com.example.quick_med.AlarmData
 
 class SetAlarm_Add : AppCompatActivity() {
 
@@ -81,6 +87,9 @@ class SetAlarm_Add : AppCompatActivity() {
             set(Calendar.HOUR_OF_DAY, hour)
             set(Calendar.MINUTE, minute)
             set(Calendar.SECOND, 0)
+            if (before(Calendar.getInstance())) {
+                add(Calendar.DATE, 1) // 현재 시간보다 이전이면 다음 날로 설정
+            }
         }
 
         // 선택된 요일 확인
@@ -92,12 +101,9 @@ class SetAlarm_Add : AppCompatActivity() {
         // 알람 데이터를 SharedPreferences에 저장
         val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString("ALARM_NAME", alarmName)
-        editor.putInt("ALARM_HOUR", hour)
-        editor.putInt("ALARM_MINUTE", minute)
-        for (i in 0 until 7) {
-            editor.putBoolean("ALARM_REPEAT_$i", repeatDays[i])
-        }
+        val alarmList = getAlarmList(sharedPreferences)
+        alarmList.add(AlarmData(alarmName, hour, minute, repeatDays))
+        editor.putString("ALARM_LIST", Gson().toJson(alarmList))
         editor.apply()
 
         // 알람 설정
@@ -127,6 +133,17 @@ class SetAlarm_Add : AppCompatActivity() {
         setResult(Activity.RESULT_OK, resultIntent)
         finish()
     }
+
+    private fun getAlarmList(sharedPreferences: SharedPreferences): MutableList<AlarmData> {
+        val json = sharedPreferences.getString("ALARM_LIST", null)
+        return if (json != null) {
+            val type = object : TypeToken<MutableList<AlarmData>>() {}.type
+            Gson().fromJson(json, type)
+        } else {
+            mutableListOf()
+        }
+    }
+
     private fun requestExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -136,6 +153,7 @@ class SetAlarm_Add : AppCompatActivity() {
             }
         }
     }
+
     private fun deleteAlarm() {
         // 알람 삭제
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -156,15 +174,14 @@ class SetAlarm_Add : AppCompatActivity() {
     private fun displayCurrentAlarm() {
         // SharedPreferences에서 알람 데이터를 읽어옵니다.
         val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
-        val alarmName = sharedPreferences.getString("ALARM_NAME", null)
-        val hour = sharedPreferences.getInt("ALARM_HOUR", -1)
-        val minute = sharedPreferences.getInt("ALARM_MINUTE", -1)
+        val alarmList = getAlarmList(sharedPreferences)
 
-        if (alarmName != null && hour != -1 && minute != -1) {
-            val amPm = if (hour >= 12) "PM" else "AM"
-            val displayHour = if (hour > 12) hour - 12 else if (hour == 0) 12 else hour
-            val displayMinute = String.format("%02d", minute)
-            textViewCurrentAlarm.text = "현재 설정된 알람: $alarmName - $amPm $displayHour:$displayMinute"
+        if (alarmList.isNotEmpty()) {
+            val alarmData = alarmList[0]
+            val amPm = if (alarmData.hour >= 12) "PM" else "AM"
+            val displayHour = if (alarmData.hour > 12) alarmData.hour - 12 else if (alarmData.hour == 0) 12 else alarmData.hour
+            val displayMinute = String.format("%02d", alarmData.minute)
+            textViewCurrentAlarm.text = "현재 설정된 알람: ${alarmData.name} - $amPm $displayHour:$displayMinute"
         } else {
             textViewCurrentAlarm.text = "현재 설정된 알람 없음"
         }
