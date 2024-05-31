@@ -13,8 +13,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var placeholder: TextView
+    private lateinit var placeholder2: TextView
     private lateinit var medicineDAO: MedicineDAO
     private lateinit var interactionAdapter: ExtendedArrayAdapter<String>
     private lateinit var interactionListView: ListView
@@ -23,39 +25,44 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Initialize UI elements
         val buttonAlarm = findViewById<Button>(R.id.button_alarm)
+        val buttonCalendar = findViewById<Button>(R.id.button_calendar)
+        val buttonMyMed = findViewById<Button>(R.id.button_my_med)
+        val buttonSearchMed = findViewById<Button>(R.id.button_search_med)
+        placeholder = findViewById(R.id.placeholder)
+        placeholder2 = findViewById(R.id.placeholder2)
+        val titleMedicineList = findViewById<TextView>(R.id.title_medicine_list)
+        val titleInteractionList = findViewById<TextView>(R.id.title_interaction_list)
+        val medicineListView = findViewById<ListView>(R.id.medicineListView)
+        interactionListView = findViewById(R.id.interactionListView)
+
+        // Set up buttons
         buttonAlarm.setOnClickListener {
             val intent = Intent(this, Alarm::class.java)
             startActivity(intent)
         }
 
-        val buttonCalendar = findViewById<Button>(R.id.button_calendar)
         buttonCalendar.setOnClickListener {
             val intent = Intent(this, Calendar::class.java)
             startActivity(intent)
         }
 
-        val buttonMyMed = findViewById<Button>(R.id.button_my_med)
         buttonMyMed.setOnClickListener {
             val intent = Intent(this, My_Med::class.java)
             startActivity(intent)
         }
 
-        val buttonSearchMed = findViewById<Button>(R.id.button_search_med)
         buttonSearchMed.setOnClickListener {
             val intent = Intent(this, Search_Med::class.java)
             startActivity(intent)
         }
 
-        placeholder = findViewById(R.id.placeholder)
-
         // Initialize ListView and Adapter
-        val medicineListView = findViewById<ListView>(R.id.medicineListView)
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         medicineListView.adapter = adapter
 
         // Initialize interaction ListView and Adapter
-        interactionListView = findViewById(R.id.interactionListView)
         interactionAdapter = ExtendedArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         interactionListView.adapter = interactionAdapter
 
@@ -124,8 +131,10 @@ class MainActivity : AppCompatActivity() {
     private fun updatePlaceholderVisibility() {
         if (adapter.isEmpty) {
             placeholder.visibility = TextView.VISIBLE
+            placeholder2.visibility = TextView.VISIBLE
         } else {
             placeholder.visibility = TextView.GONE
+            placeholder2.visibility = TextView.GONE
         }
     }
 
@@ -146,13 +155,13 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 if (!interactionSet.contains(sortedPair)) {
-                    interactionAdapter.add("${interaction.medicine1}과(와) ${interaction.medicine2}은 같이 드시면 안됩니다. 사유: ${interaction.reason}")
+                    interactionAdapter.add("${interaction.medicine1}과(와) ${interaction.medicine2}은 같이 드시면 안됩니다.\n사유: ${interaction.reason} 발생 위험이 증가합니다.")
                     interactionSet.add(sortedPair)
                 }
             }
 
             if (interactions.isEmpty()) {
-                interactionAdapter.add("문제 없음")
+                interactionAdapter.add("병용시 문제되는 약품이 없습니다.")
             }
 
             // 중복된 항목 제거
@@ -164,3 +173,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+

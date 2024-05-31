@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
@@ -16,7 +17,39 @@
     <ListView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"/>
+
+    <LinearLayout
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/icon"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="저장한 약품이 없습니다."
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:paddingTop="16dp"/>
+
+        <Button
+            android:id="@+id/button_add_medicine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="약 추가하기"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
 </LinearLayout>

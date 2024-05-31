@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -9,74 +10,141 @@
 
     <Button
         android:id="@+id/button_alarm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="46dp"
         android:text="Go to Alarm"
         app:layout_constraintBottom_toTopOf="@+id/button_calendar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_default="spread" />
 
     <Button
         android:id="@+id/button_calendar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="46dp"
         android:text="Go to Calendar"
         app:layout_constraintBottom_toTopOf="@+id/button_my_med"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_alarm" />
+        app:layout_constraintTop_toBottomOf="@+id/button_alarm"
+        app:layout_constraintWidth_default="spread" />
 
     <Button
         android:id="@+id/button_my_med"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="46dp"
         android:text="Go to My_Med"
         app:layout_constraintBottom_toTopOf="@+id/button_search_med"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_calendar" />
+        app:layout_constraintTop_toBottomOf="@+id/button_calendar"
+        app:layout_constraintWidth_default="spread" />
 
     <Button
         android:id="@+id/button_search_med"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
         android:text="Go to SearchMed"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/title_medicine_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_my_med" />
+        app:layout_constraintTop_toBottomOf="@+id/button_my_med"
+        app:layout_constraintWidth_default="spread" />
 
+    <TextView
+        android:id="@+id/title_medicine_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="복용중인 약"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/medicineListView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_search_med" />
+
+    <!-- Medicine ListView Divider -->
+    <View
+        android:id="@+id/view5"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintBottom_toTopOf="@+id/medicineListView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_medicine_list" />
+
+    <ListView
+        android:id="@+id/medicineListView"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        app:layout_constraintBottom_toTopOf="@+id/title_interaction_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_medicine_list" />
+
+    <TextView
+        android:id="@+id/title_interaction_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="병용금기 약물"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/interactionListView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/medicineListView" />
+
+    <!-- Interaction ListView Divider -->
+    <View
+        android:id="@+id/view3"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintBottom_toTopOf="@+id/interactionListView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_interaction_list" />
+
+    <ListView
+        android:id="@+id/interactionListView"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_interaction_list" />
+
+    <!-- Placeholder: 약품이 없습니다 -->
     <TextView
         android:id="@+id/placeholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="약품이 없습니다."
-        app:layout_constraintTop_toBottomOf="@+id/button_search_med"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="16dp"
-        android:visibility="gone" />
+        app:layout_constraintTop_toBottomOf="@+id/title_interaction_list" />
 
-    <ListView
-        android:id="@+id/medicineListView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/button_search_med"
-        app:layout_constraintBottom_toTopOf="@+id/interactionListView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintHeight_default="spread" />
-
-    <ListView
-        android:id="@+id/interactionListView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/medicineListView"
+    <!-- Placeholder2: 등고된 약품이 없습니다 -->
+    <TextView
+        android:id="@+id/placeholder2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="등고된 약품이 없습니다."
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintHeight_default="spread" />
+        app:layout_constraintTop_toBottomOf="@+id/title_medicine_list"
+        app:layout_constraintVertical_bias="0.33" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

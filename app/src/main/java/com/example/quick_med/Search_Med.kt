@@ -2,20 +2,22 @@ package com.example.quick_med
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
-import android.widget.Toast
 
 class Search_Med : AppCompatActivity() {
 
     private lateinit var searchView: SearchView
     private lateinit var listView: ListView
+    private lateinit var emptyView: View
     private val serviceKey = "zp%2FXmsF6TzhsNiU1jUF2ElWrarTPBUzV7ccDYcc8jPtbcz3%2BkkzF9ZG%2BegIM2ib7CgLvq1LEZF%2FrG0MH1gDqLw%3D%3D"
     private lateinit var medicineDAO: MedicineDAO
 
@@ -26,16 +28,25 @@ class Search_Med : AppCompatActivity() {
         medicineDAO = MedicineDAO(this)
         searchView = findViewById(R.id.search_view)
         listView = findViewById(R.id.list_view)
+        emptyView = findViewById(R.id.empty_view)
+
+        // Set empty view for the ListView
+        listView.emptyView = emptyView
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query != null) {
+                if (query != null && query.isNotEmpty()) {
                     searchMedicines(query)
+                } else {
+                    showEmptyView()
                 }
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText.isNullOrEmpty()) {
+                    showEmptyView()
+                }
                 return false
             }
         })
@@ -108,6 +119,7 @@ class Search_Med : AppCompatActivity() {
             } catch (e: Exception) {
                 e.printStackTrace()
                 runOnUiThread {
+                    //Toast.makeText(this@Search_Med, "검색 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
                 }
             } finally {
                 onComplete()
@@ -144,10 +156,16 @@ class Search_Med : AppCompatActivity() {
             } catch (e: Exception) {
                 e.printStackTrace()
                 runOnUiThread {
+                    //Toast.makeText(this@Search_Med, "검색 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
                 }
             } finally {
                 onComplete()
             }
         }
+    }
+
+    private fun showEmptyView() {
+        listView.adapter = null
+        emptyView.visibility = View.VISIBLE
     }
 }
