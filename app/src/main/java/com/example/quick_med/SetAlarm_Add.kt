@@ -16,17 +16,14 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.Calendar
 
-// AlarmData 클래스를 별도의 파일에서 가져옵니다.
-import com.example.quick_med.AlarmData
-
 class SetAlarm_Add : AppCompatActivity() {
 
-    private lateinit var spinnerAmPm: Spinner
-    private lateinit var numberPickerHour: NumberPicker
-    private lateinit var numberPickerMinute: NumberPicker
-    private lateinit var editTextAlarmName: EditText
-    private lateinit var dayCheckBoxes: Array<CheckBox>
-    private lateinit var textViewCurrentAlarm: TextView
+    private lateinit var spinnerAmPm: Spinner // 오전/오후 스피너
+    private lateinit var numberPickerHour: NumberPicker // 시간 선택기
+    private lateinit var numberPickerMinute: NumberPicker // 분 선택기
+    private lateinit var editTextAlarmName: EditText // 알람 이름 입력란
+    private lateinit var dayCheckBoxes: Array<CheckBox> // 요일 선택 체크박스
+    private lateinit var textViewCurrentAlarm: TextView // 현재 알람 표시 텍스트뷰
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +66,7 @@ class SetAlarm_Add : AppCompatActivity() {
         displayCurrentAlarm()
     }
 
+    // 알람 설정
     private fun setAlarm() {
         val amPm = spinnerAmPm.selectedItemPosition // 0은 AM, 1은 PM
         var hour = numberPickerHour.value
@@ -134,6 +132,7 @@ class SetAlarm_Add : AppCompatActivity() {
         finish()
     }
 
+    // 알람 목록 가져오기
     private fun getAlarmList(sharedPreferences: SharedPreferences): MutableList<AlarmData> {
         val json = sharedPreferences.getString("ALARM_LIST", null)
         return if (json != null) {
@@ -144,6 +143,7 @@ class SetAlarm_Add : AppCompatActivity() {
         }
     }
 
+    // 정확한 알람 권한 요청
     private fun requestExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -154,8 +154,8 @@ class SetAlarm_Add : AppCompatActivity() {
         }
     }
 
+    // 알람 삭제
     private fun deleteAlarm() {
-        // 알람 삭제
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -171,8 +171,8 @@ class SetAlarm_Add : AppCompatActivity() {
         displayCurrentAlarm()
     }
 
+    // 현재 알람 표시
     private fun displayCurrentAlarm() {
-        // SharedPreferences에서 알람 데이터를 읽어옵니다.
         val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
         val alarmList = getAlarmList(sharedPreferences)
 

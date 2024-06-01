@@ -8,6 +8,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.Ringtone
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -18,8 +21,11 @@ class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val alarmName = intent.getStringExtra("ALARM_NAME")
         showNotification(context, alarmName)
-    }
 
+        val alarmUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        val ringtone: Ringtone = RingtoneManager.getRingtone(context, alarmUri)
+        ringtone.play()
+    }
     private fun showNotification(context: Context, alarmName: String?) {
         val channelId = "alarm_channel"
         val channelName = "Alarm Notification"
