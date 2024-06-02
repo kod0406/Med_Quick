@@ -1,25 +1,40 @@
 package com.example.quick_med
 
 import android.os.Bundle
-import android.widget.NumberPicker
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Switch
+import android.widget.TimePicker
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
-class AlarmActivity : AppCompatActivity() {
-
+class Alarm : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_set_alarm_2)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_set_alarm_1)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
-        val hourPicker: NumberPicker = findViewById(R.id.numberPicker_hour)
-        val minutePicker: NumberPicker = findViewById(R.id.numberPicker_minute)
+        val alarmLabelEditText = findViewById<EditText>(R.id.alarmLabelEditText)
+        val alarmTimePicker = findViewById<TimePicker>(R.id.alarmTimePicker)
+        val switchEnableAlarm = findViewById<Switch>(R.id.switch_enable_alarm)
+        val deleteButton = findViewById<Button>(R.id.deleteButton)
+        val saveButton = findViewById<Button>(R.id.saveButton)
 
-        // 시간 선택 설정
-        hourPicker.minValue = 1
-        hourPicker.maxValue = 12
+        // 알람 삭제 버튼 클릭 이벤트
+        deleteButton.setOnClickListener {
+            // 알람 삭제 로직 구현
+        }
 
-        // 분 선택 설정
-        minutePicker.minValue = 0
-        minutePicker.maxValue = 59
-        minutePicker.setFormatter { value -> String.format("%02d", value) }
+        // 알람 저장 버튼 클릭 이벤트
+        saveButton.setOnClickListener {
+            // 알람 저장 로직 구현
+        }
     }
 }
