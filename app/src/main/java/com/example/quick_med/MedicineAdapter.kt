@@ -34,8 +34,19 @@ class MedicineAdapter(private val context: Context, private val dataSource: List
         val medicine = getItem(position) as Medicine
         nameTextView.text = medicine.name
         descriptionTextView.text = medicine.description
-        Picasso.get().load(medicine.imageUrl).into(imageView)
+
+        if (medicine.imageUrl != null && medicine.imageUrl.isNotEmpty()) {
+            try {
+                Picasso.get().load(medicine.imageUrl).placeholder(R.drawable.placeholder_image).into(imageView)
+            } catch (e: Exception) {
+                imageView.setImageResource(R.drawable.placeholder_image)
+                e.printStackTrace()
+            }
+        } else {
+            imageView.setImageResource(R.drawable.placeholder_image)
+        }
 
         return rowView
     }
 }
+

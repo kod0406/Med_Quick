@@ -15,4 +15,6 @@
     <string name="side_effects_info">부작용 정보</string>
     <string name="yes">예</string>
     <string name="no">아니요</string>
+    <string name="title_activity_info_med">Info_Med</string>
+    <string name="title_activity_alarm_receiver">AlarmReceiver</string>
 </resources>
