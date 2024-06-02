@@ -3,16 +3,22 @@ package com.example.quick_med
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.app.Activity
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.Switch
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.widget.TextView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
@@ -21,19 +27,18 @@ import java.util.Locale
 
 class SetAlarm : AppCompatActivity() {
     private companion object {
-        const val REQUEST_CODE = 1 // 요청 코드 정의
+        const val REQUEST_CODE_ADD = 1 // 알람 추가 요청 코드
+        const val REQUEST_CODE_MODIFY = 2 // 알람 수정 요청 코드
+        private const val REQUEST_CODE_EXACT_ALARM = 1
     }
-
-    private lateinit var alarmListLayout: LinearLayout // 알람 목록 레이아웃
+    private lateinit var alarmListLayout: LinearLayout
     private lateinit var sharedPreferences: SharedPreferences
-    private val alarmList: MutableList<AlarmData> = mutableListOf()
+    private lateinit var alarmList: MutableList<AlarmData>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge() // 엣지투엣지 활성화
-        setContentView(R.layout.activity_set_alarm_0) // 레이아웃 설정
-
-        sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_set_alarm_0)
 
         // 시스템 바 패딩 설정
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -48,35 +53,32 @@ class SetAlarm : AppCompatActivity() {
         val dateFormat = SimpleDateFormat("M월 d일 E요일", Locale.KOREAN)
         val dateString = dateFormat.format(calendar.time)
         dateTextView.text = dateString
-
-        alarmListLayout = findViewById(R.id.alarmListLayout) // 알람 목록 레이아웃 초기화
+        alarmListLayout = findViewById(R.id.alarmListLayout)
+        sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
 
         // 알람 설정 화면으로 이동하는 버튼
         val button: Button = findViewById(R.id.addbutton)
         button.setOnClickListener {
             val intent = Intent(this, SetAlarm_Add::class.java)
-            startActivityForResult(intent, REQUEST_CODE) // 알람 설정 화면으로 이동
+            startActivityForResult(intent, REQUEST_CODE_ADD) // 알람 설정 화면으로 이동
         }
 
         // 저장된 알람 불러오기
         loadAlarms()
     }
 
-    // 저장된 알람 불러오기
     private fun loadAlarms() {
-        alarmList.clear()
-        alarmList.addAll(getAlarmList(sharedPreferences))
-
-        for (alarmData in alarmList) {
+        alarmList = getAlarmList(sharedPreferences)
+        for (i in alarmList.indices) {
+            val alarmData = alarmList[i]
             val amPm = if (alarmData.hour >= 12) "PM" else "AM"
             val displayHour = if (alarmData.hour > 12) alarmData.hour - 12 else if (alarmData.hour == 0) 12 else alarmData.hour
             val displayMinute = String.format("%02d", alarmData.minute)
             val time = "$amPm $displayHour:$displayMinute"
-            addAlarmToList(alarmData, time)
+            addAlarmToList(alarmData, time, i)
         }
     }
 
-    // 알람 목록 가져오기
     private fun getAlarmList(sharedPreferences: SharedPreferences): MutableList<AlarmData> {
         val json = sharedPreferences.getString("ALARM_LIST", null)
         return if (json != null) {
@@ -87,44 +89,183 @@ class SetAlarm : AppCompatActivity() {
         }
     }
 
-    // 알람 목록 저장하기
-    private fun saveAlarms() {
-        val editor = sharedPreferences.edit()
-        val json = Gson().toJson(alarmList)
-        editor.putString("ALARM_LIST", json)
-        editor.apply()
-    }
-
-    // 다른 액티비티에서 결과 받기
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             val label = data?.getStringExtra("ALARM_NAME")
             val hour = data?.getIntExtra("ALARM_HOUR", -1) ?: -1
             val minute = data?.getIntExtra("ALARM_MINUTE", -1) ?: -1
-            val repeatDays = data?.getBooleanArrayExtra("ALARM_REPEAT_DAYS") ?: BooleanArray(7) { false } // 기본값은 일주일 반복 안함
+            val alarmIndex = data?.getIntExtra("ALARM_INDEX", -1) ?: -1
+            val isEnabled = data?.getBooleanExtra("ALARM_ENABLED", true) ?: true
+
             if (label != null && hour != -1 && minute != -1) {
                 val time = String.format("%02d:%02d", hour, minute)
-                val newAlarm = AlarmData(label, hour, minute, repeatDays)
-                alarmList.add(newAlarm)
-                saveAlarms() // 알람 목록 저장
-                addAlarmToList(newAlarm, time) // 알람 목록에 추가
+                val alarmData = AlarmData(label, hour, minute, BooleanArray(7), isEnabled)
+
+                if (requestCode == REQUEST_CODE_ADD) {
+                    addAlarmToList(alarmData, time, alarmList.size)
+                    saveAlarm(alarmData)
+                } else if (requestCode == REQUEST_CODE_MODIFY && alarmIndex != -1) {
+                    modifyAlarmInList(alarmIndex, alarmData, time)
+                    updateAlarm(alarmIndex, alarmData)
+                }
+            } else if (requestCode == REQUEST_CODE_MODIFY && alarmIndex != -1) {
+                alarmListLayout.removeViewAt(alarmIndex)
+                removeAlarm(alarmIndex)
             }
         }
     }
 
-    // 알람 목록에 추가
+    private fun saveAlarm(alarmData: AlarmData) {
+        alarmList.add(alarmData)
+        val editor = sharedPreferences.edit()
+        editor.putString("ALARM_LIST", Gson().toJson(alarmList))
+        editor.apply()
+    }
+
+    private fun updateAlarm(index: Int, alarmData: AlarmData) {
+        alarmList[index] = alarmData
+        val editor = sharedPreferences.edit()
+        editor.putString("ALARM_LIST", Gson().toJson(alarmList))
+        editor.apply()
+    }
+
+    private fun removeAlarm(index: Int) {
+        alarmList.removeAt(index)
+        val editor = sharedPreferences.edit()
+        editor.putString("ALARM_LIST", Gson().toJson(alarmList))
+        editor.apply()
+    }
+
     @SuppressLint("MissingInflatedId")
-    private fun addAlarmToList(alarmData: AlarmData, time: String) {
+    private fun addAlarmToList(alarmData: AlarmData, time: String, index: Int) {
         val alarmView = layoutInflater.inflate(R.layout.alarm_item, alarmListLayout, false)
         val alarmLabelTextView = alarmView.findViewById<TextView>(R.id.alarmLabelTextView)
         val alarmTimeTextView = alarmView.findViewById<TextView>(R.id.alarmTimeTextView)
-
+        val alarmSwitch = alarmView.findViewById<Switch>(R.id.alarmSwitch)
 
         alarmLabelTextView.text = alarmData.name
         alarmTimeTextView.text = time
+        alarmSwitch.isChecked = alarmData.isEnabled
 
+        alarmSwitch.setOnCheckedChangeListener { _, isChecked ->
+            alarmData.isEnabled = isChecked
+            updateAlarm(index, alarmData)
+            if (isChecked) {
+                setAlarm(alarmData)
+            } else {
+                cancelAlarm(alarmData)
+            }
+        }
 
-        alarmListLayout.addView(alarmView, 0) // 알람 목록에 뷰 추가
+        alarmView.setOnClickListener {
+            val intent = Intent(this, SetAlarm_Modify::class.java).apply {
+                putExtra("ALARM_NAME", alarmData.name)
+                putExtra("ALARM_HOUR", alarmData.hour)
+                putExtra("ALARM_MINUTE", alarmData.minute)
+                putExtra("ALARM_INDEX", index)
+                putExtra("ALARM_ENABLED", alarmData.isEnabled)
+            }
+            startActivityForResult(intent, REQUEST_CODE_MODIFY)
+        }
+
+        alarmListLayout.addView(alarmView, index)
+    }
+
+    private fun checkExactAlarmPermission(alarmData: AlarmData) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                val intent = Intent(
+                    Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                    Uri.parse("package:$packageName")
+                )
+                startActivityForResult(intent, REQUEST_CODE_EXACT_ALARM)
+            } else {
+                setAlarm(alarmData)
+            }
+        } else {
+            setAlarm(alarmData)
+        }
+    }
+    private fun setAlarm(alarmData: AlarmData) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            putExtra("ALARM_NAME", alarmData.name)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            alarmData.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, alarmData.hour)
+            set(Calendar.MINUTE, alarmData.minute)
+            set(Calendar.SECOND, 0)
+            if (before(Calendar.getInstance())) {
+                add(Calendar.DATE, 1)
+            }
+        }
+        if (alarmData.daysOfWeek.contains(true)) {
+            for (i in alarmData.daysOfWeek.indices) {
+                if (alarmData.daysOfWeek[i]) {
+                    calendar.set(Calendar.DAY_OF_WEEK, i + 1)
+                    alarmManager.setRepeating(
+                        AlarmManager.RTC_WAKEUP, calendar.timeInMillis,
+                        AlarmManager.INTERVAL_DAY * 7, pendingIntent
+                    )
+                }
+            }
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        }
+    }
+    private fun cancelAlarm(alarmData: AlarmData) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            alarmData.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+    }
+
+    private fun modifyAlarmInList(index: Int, alarmData: AlarmData, time: String) {
+        val alarmView = layoutInflater.inflate(R.layout.alarm_item, alarmListLayout, false)
+        val alarmLabelTextView = alarmView.findViewById<TextView>(R.id.alarmLabelTextView)
+        val alarmTimeTextView = alarmView.findViewById<TextView>(R.id.alarmTimeTextView)
+        val alarmSwitch = alarmView.findViewById<Switch>(R.id.alarmSwitch)
+
+        alarmLabelTextView.text = alarmData.name
+        alarmTimeTextView.text = time
+        alarmSwitch.isChecked = alarmData.isEnabled
+
+        alarmSwitch.setOnCheckedChangeListener { _, isChecked ->
+            alarmData.isEnabled = isChecked
+            updateAlarm(index, alarmData)
+            if (isChecked) {
+                setAlarm(alarmData)
+            } else {
+                cancelAlarm(alarmData)
+            }
+        }
+
+        alarmListLayout.removeViewAt(index)
+        alarmListLayout.addView(alarmView, index)
+
+        alarmView.setOnClickListener {
+            val intent = Intent(this, SetAlarm_Modify::class.java).apply {
+                putExtra("ALARM_NAME", alarmData.name)
+                putExtra("ALARM_HOUR", alarmData.hour)
+                putExtra("ALARM_MINUTE", alarmData.minute)
+                putExtra("ALARM_INDEX", index)
+                putExtra("ALARM_ENABLED", alarmData.isEnabled)
+            }
+            startActivityForResult(intent, REQUEST_CODE_MODIFY)
+        }
     }
 }

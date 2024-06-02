@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         // Set up buttons
         buttonAlarm.setOnClickListener {
-            val intent = Intent(this, Alarm::class.java)
+            val intent = Intent(this, SetAlarm::class.java)
             startActivity(intent)
         }
 
