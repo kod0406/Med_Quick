@@ -1,33 +1,35 @@
 package com.example.quick_med
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import android.os.Handler
 import android.content.Intent
-import android.os.Looper
-import android.widget.ImageView
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
-class Intro2 : ComponentActivity() {
+class Intro2 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_intro2)
 
-        // Ensure the ImageView is being set properly
-        val introImageView = findViewById<ImageView>(R.id.introImageView)
+        val checkBox = findViewById<CheckBox>(R.id.checkBoxAgree)
+        val buttonAgree = findViewById<Button>(R.id.buttonAgree)
 
-        // 3초 후에  액티비티로 전환
-        Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish() // 인트로 액티비티를 종료하여 뒤로 가기 버튼을 눌렀을 때 다시 돌아오지 않게 함
-        }, 3000) // 3000밀리초 == 3초
+        buttonAgree.setOnClickListener {
+            if (checkBox.isChecked) {
+                val sharedPreferences: SharedPreferences = getSharedPreferences("QuickMedPrefs", MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putBoolean("isTermsAccepted", true)
+                editor.apply()
+
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            } else {
+                // 약관 동의 체크박스를 체크하지 않은 경우의 처리
+                Toast.makeText(this, "약관에 동의해 주세요.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

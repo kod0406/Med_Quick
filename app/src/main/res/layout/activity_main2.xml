@@ -24,17 +24,17 @@
         android:id="@+id/button_my_med"
         android:layout_width="80dp"
         android:layout_height="37dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginTop="46dp"
+        android:layout_marginBottom="130dp"
         android:background="@drawable/button_border"
         android:text="더보기"
         android:textAlignment="center"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/medicineListView"
+        app:layout_constraintBottom_toBottomOf="@+id/medicineListView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.951"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/med_list"
-        app:layout_constraintVertical_bias="0.97" />
+        app:layout_constraintTop_toTopOf="@+id/med_list" />
 
 
     <Button
@@ -57,7 +57,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3">
+        app:layout_constraintVertical_bias="0.31">
 
         <ImageView
             android:id="@+id/pill_icon"
@@ -155,16 +155,17 @@
         android:id="@+id/button_more_info"
         android:layout_width="80dp"
         android:layout_height="37dp"
+        android:layout_marginTop="46dp"
+        android:layout_marginBottom="139dp"
         android:background="@drawable/button_border"
         android:text="상세보기"
         android:textAlignment="center"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/button_alarm"
+        app:layout_constraintBottom_toBottomOf="@+id/interactionListView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.95"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_my_med"
-        app:layout_constraintVertical_bias="0.56" />
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout" />
 
     <Button
         android:id="@+id/button_alarm"
@@ -201,7 +202,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.021" />
@@ -210,26 +211,25 @@
         android:id="@+id/placeholder2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="140dp"
         android:text="등고된 약품이 없습니다."
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/logo_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/interactionListView"
-        app:layout_constraintVertical_bias="0.41000003" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/placeholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="364dp"
         android:text="약품이 없습니다."
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/medicineListView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/medicineListView" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ListView
         android:id="@+id/medicineListView"
@@ -254,18 +254,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
         app:layout_constraintVertical_bias="0.812" />
-
-    <TextView
-        android:id="@+id/loadingTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="로딩중입니다..."
-        android:textAlignment="center"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/logo_bottom"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        app:layout_constraintVertical_bias="0.56" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
