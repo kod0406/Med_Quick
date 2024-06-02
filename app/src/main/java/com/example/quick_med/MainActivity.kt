@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
@@ -18,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var placeholder: TextView
     private lateinit var placeholder2: TextView
     private lateinit var medicineDAO: MedicineDAO
-    private lateinit var interactionAdapter: ExtendedArrayAdapter<String>
+    private lateinit var interactionAdapter: ArrayAdapter<String>
     private lateinit var interactionListView: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         val buttonCalendar = findViewById<Button>(R.id.button_calendar)
         val buttonMyMed = findViewById<Button>(R.id.button_my_med)
         val buttonSearchMed = findViewById<Button>(R.id.button_search_med)
+        val buttonMoreInfo = findViewById<Button>(R.id.button_more_info)
         placeholder = findViewById(R.id.placeholder)
         placeholder2 = findViewById(R.id.placeholder2)
         val titleMedicineList = findViewById<TextView>(R.id.title_medicine_list)
@@ -58,12 +61,17 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Set up more info button
+        buttonMoreInfo.setOnClickListener {
+            showInteractionPopup()
+        }
+
         // Initialize ListView and Adapter
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         medicineListView.adapter = adapter
 
-        // Initialize interaction ListView and Adapter
-        interactionAdapter = ExtendedArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
+        // Initialize interaction ListView and Adapter for simple info
+        interactionAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         interactionListView.adapter = interactionAdapter
 
         // Initialize MedicineDAO
@@ -155,7 +163,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 if (!interactionSet.contains(sortedPair)) {
-                    interactionAdapter.add("${interaction.medicine1}과(와) ${interaction.medicine2}은 같이 드시면 안됩니다.\n사유: ${interaction.reason} 발생 위험이 증가합니다.")
+                    interactionAdapter.add("${interaction.medicine1}과(와)\n5${interaction.medicine2}")
                     interactionSet.add(sortedPair)
                 }
             }
@@ -164,13 +172,38 @@ class MainActivity : AppCompatActivity() {
                 interactionAdapter.add("병용시 문제되는 약품이 없습니다.")
             }
 
-            // 중복된 항목 제거
-            val uniqueList = interactionAdapter.getItems().distinct()
-            interactionAdapter.clear()
-            interactionAdapter.addAll(uniqueList)
-
             interactionAdapter.notifyDataSetChanged()
         }
     }
-}
 
+    private fun showInteractionPopup() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("병용금기 약물")
+
+        // Inflate and set the custom view
+        val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val popupView = inflater.inflate(R.layout.dialog_interaction_list, null)
+
+        val listView = popupView.findViewById<ListView>(R.id.popupListView)
+        val popupAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf<String>())
+        listView.adapter = popupAdapter
+
+        // Populate popup list with detailed info
+        val checker = DrugInteractionChecker(this)
+        checker.checkInteractions { interactions, noInteractionMeds ->
+            interactions.forEach { interaction ->
+                popupAdapter.add("${interaction.medicine1}과(와) ${interaction.medicine2}\n은 같이 드시면 안됩니다.\n사유: ${interaction.reason} 발생 위험이 증가합니다.")
+            }
+
+            if (interactions.isEmpty()) {
+                popupAdapter.add("병용시 문제되는 약품이 없습니다.")
+            }
+
+            popupAdapter.notifyDataSetChanged()
+        }
+
+        builder.setView(popupView)
+        builder.setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
+        builder.create().show()
+    }
+}

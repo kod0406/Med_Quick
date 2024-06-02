@@ -147,4 +147,27 @@
         app:layout_constraintTop_toBottomOf="@+id/title_medicine_list"
         app:layout_constraintVertical_bias="0.33" />
 
+    <Button
+        android:id="@+id/button_more_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="114dp"
+        android:layout_marginTop="255dp"
+        android:text="상세보기"
+        app:layout_constraintBottom_toBottomOf="@+id/title_interaction_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/title_interaction_list"
+        app:layout_constraintTop_toTopOf="@+id/medicineListView" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="252dp"
+        android:text="상세보기"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.734"
+        app:layout_constraintStart_toEndOf="@+id/title_medicine_list"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
