@@ -4,8 +4,9 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
@@ -13,6 +14,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,6 +25,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var medicineDAO: MedicineDAO
     private lateinit var interactionAdapter: ArrayAdapter<String>
     private lateinit var interactionListView: ListView
+    private lateinit var dateTextView: TextView
+    private lateinit var loadingTextView: TextView
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,12 +39,14 @@ class MainActivity : AppCompatActivity() {
         val buttonMyMed = findViewById<Button>(R.id.button_my_med)
         val buttonSearchMed = findViewById<Button>(R.id.button_search_med)
         val buttonMoreInfo = findViewById<Button>(R.id.button_more_info)
+        dateTextView = findViewById(R.id.dateTextView)
         placeholder = findViewById(R.id.placeholder)
         placeholder2 = findViewById(R.id.placeholder2)
         val titleMedicineList = findViewById<TextView>(R.id.title_medicine_list)
         val titleInteractionList = findViewById<TextView>(R.id.title_interaction_list)
         val medicineListView = findViewById<ListView>(R.id.medicineListView)
         interactionListView = findViewById(R.id.interactionListView)
+        loadingTextView = findViewById(R.id.loadingTextView)
 
         // Set up buttons
         buttonAlarm.setOnClickListener {
@@ -87,6 +95,9 @@ class MainActivity : AppCompatActivity() {
 
         // Check drug interactions initially
         checkDrugInteractions()
+
+        // Schedule checkDrugInteractions to run after 3 seconds
+        handler.postDelayed({ checkDrugInteractions() }, 3000)
     }
 
     override fun onResume() {
@@ -94,6 +105,23 @@ class MainActivity : AppCompatActivity() {
         // Reload data when the activity is resumed
         loadSavedMedicines()
         checkDrugInteractions()
+        updateDateTime()
+
+        // Show loading text and hide interaction list initially
+        interactionListView.visibility = ListView.GONE
+        loadingTextView.visibility = TextView.VISIBLE
+
+        // Schedule interactionListView to be shown after 5 seconds
+        handler.postDelayed({
+            interactionListView.visibility = ListView.VISIBLE
+            loadingTextView.visibility = TextView.GONE
+        }, 5000)
+    }
+
+    private fun updateDateTime() {
+        val dateFormat = SimpleDateFormat("M월 d일 E요일", Locale.getDefault())
+        val currentDate = dateFormat.format(Date())
+        dateTextView.text = currentDate
     }
 
     private fun loadSavedMedicines() {
@@ -163,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 if (!interactionSet.contains(sortedPair)) {
-                    interactionAdapter.add("${interaction.medicine1}과(와)\n5${interaction.medicine2}")
+                    interactionAdapter.add("${interaction.medicine1}과(와)\n${interaction.medicine2}")
                     interactionSet.add(sortedPair)
                 }
             }
