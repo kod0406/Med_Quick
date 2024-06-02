@@ -17,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="31">
+
         <activity
             android:name=".SetAlarm"
             android:exported="false"
@@ -74,6 +75,10 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".SetAlarm_Add"
+            android:exported="false"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".SetAlarm_Modify"
             android:exported="false"
             android:theme="@style/AppTheme" />
         <receiver android:name=".AlarmReceiver" />

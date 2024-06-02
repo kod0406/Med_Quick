@@ -172,6 +172,41 @@ class SetAlarm : AppCompatActivity() {
         alarmListLayout.addView(alarmView, index)
     }
 
+    private fun modifyAlarmInList(index: Int, alarmData: AlarmData, time: String) {
+        val alarmView = layoutInflater.inflate(R.layout.alarm_item, alarmListLayout, false)
+        val alarmLabelTextView = alarmView.findViewById<TextView>(R.id.alarmLabelTextView)
+        val alarmTimeTextView = alarmView.findViewById<TextView>(R.id.alarmTimeTextView)
+        val alarmSwitch = alarmView.findViewById<Switch>(R.id.alarmSwitch)
+
+        alarmLabelTextView.text = alarmData.name
+        alarmTimeTextView.text = time
+        alarmSwitch.isChecked = alarmData.isEnabled
+
+        alarmSwitch.setOnCheckedChangeListener { _, isChecked ->
+            alarmData.isEnabled = isChecked
+            updateAlarm(index, alarmData)
+            if (isChecked) {
+                setAlarm(alarmData)
+            } else {
+                cancelAlarm(alarmData)
+            }
+        }
+
+        alarmListLayout.removeViewAt(index)
+        alarmListLayout.addView(alarmView, index)
+
+        alarmView.setOnClickListener {
+            val intent = Intent(this, SetAlarm_Modify::class.java).apply {
+                putExtra("ALARM_NAME", alarmData.name)
+                putExtra("ALARM_HOUR", alarmData.hour)
+                putExtra("ALARM_MINUTE", alarmData.minute)
+                putExtra("ALARM_INDEX", index)
+                putExtra("ALARM_ENABLED", alarmData.isEnabled)
+            }
+            startActivityForResult(intent, REQUEST_CODE_MODIFY)
+        }
+    }
+
     private fun checkExactAlarmPermission(alarmData: AlarmData) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -188,6 +223,7 @@ class SetAlarm : AppCompatActivity() {
             setAlarm(alarmData)
         }
     }
+
     private fun setAlarm(alarmData: AlarmData) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java).apply {
@@ -222,6 +258,7 @@ class SetAlarm : AppCompatActivity() {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
         }
     }
+
     private fun cancelAlarm(alarmData: AlarmData) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)
@@ -232,40 +269,5 @@ class SetAlarm : AppCompatActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         alarmManager.cancel(pendingIntent)
-    }
-
-    private fun modifyAlarmInList(index: Int, alarmData: AlarmData, time: String) {
-        val alarmView = layoutInflater.inflate(R.layout.alarm_item, alarmListLayout, false)
-        val alarmLabelTextView = alarmView.findViewById<TextView>(R.id.alarmLabelTextView)
-        val alarmTimeTextView = alarmView.findViewById<TextView>(R.id.alarmTimeTextView)
-        val alarmSwitch = alarmView.findViewById<Switch>(R.id.alarmSwitch)
-
-        alarmLabelTextView.text = alarmData.name
-        alarmTimeTextView.text = time
-        alarmSwitch.isChecked = alarmData.isEnabled
-
-        alarmSwitch.setOnCheckedChangeListener { _, isChecked ->
-            alarmData.isEnabled = isChecked
-            updateAlarm(index, alarmData)
-            if (isChecked) {
-                setAlarm(alarmData)
-            } else {
-                cancelAlarm(alarmData)
-            }
-        }
-
-        alarmListLayout.removeViewAt(index)
-        alarmListLayout.addView(alarmView, index)
-
-        alarmView.setOnClickListener {
-            val intent = Intent(this, SetAlarm_Modify::class.java).apply {
-                putExtra("ALARM_NAME", alarmData.name)
-                putExtra("ALARM_HOUR", alarmData.hour)
-                putExtra("ALARM_MINUTE", alarmData.minute)
-                putExtra("ALARM_INDEX", index)
-                putExtra("ALARM_ENABLED", alarmData.isEnabled)
-            }
-            startActivityForResult(intent, REQUEST_CODE_MODIFY)
-        }
     }
 }
