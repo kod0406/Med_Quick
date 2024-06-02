@@ -24,6 +24,7 @@ class SetAlarm_Modify : AppCompatActivity() {
         deleteButton = findViewById(R.id.deleteButton)
         saveButton = findViewById(R.id.saveButton)
 
+
         // Intent로부터 알람 데이터를 가져옴
         val alarmName = intent.getStringExtra("ALARM_NAME")
         val alarmHour = intent.getIntExtra("ALARM_HOUR", -1)

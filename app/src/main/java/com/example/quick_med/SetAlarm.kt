@@ -3,9 +3,14 @@ package com.example.quick_med
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.app.Activity
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Switch
@@ -24,6 +29,7 @@ class SetAlarm : AppCompatActivity() {
     private companion object {
         const val REQUEST_CODE_ADD = 1 // 알람 추가 요청 코드
         const val REQUEST_CODE_MODIFY = 2 // 알람 수정 요청 코드
+        private const val REQUEST_CODE_EXACT_ALARM = 1
     }
     private lateinit var alarmListLayout: LinearLayout
     private lateinit var sharedPreferences: SharedPreferences
@@ -55,11 +61,6 @@ class SetAlarm : AppCompatActivity() {
         button.setOnClickListener {
             val intent = Intent(this, SetAlarm_Add::class.java)
             startActivityForResult(intent, REQUEST_CODE_ADD) // 알람 설정 화면으로 이동
-        }
-        val buttonback = findViewById<Button>(R.id.back_button)
-        buttonback.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
         }
 
         // 저장된 알람 불러오기
@@ -150,6 +151,11 @@ class SetAlarm : AppCompatActivity() {
         alarmSwitch.setOnCheckedChangeListener { _, isChecked ->
             alarmData.isEnabled = isChecked
             updateAlarm(index, alarmData)
+            if (isChecked) {
+                setAlarm(alarmData)
+            } else {
+                cancelAlarm(alarmData)
+            }
         }
 
         alarmView.setOnClickListener {
@@ -166,6 +172,68 @@ class SetAlarm : AppCompatActivity() {
         alarmListLayout.addView(alarmView, index)
     }
 
+    private fun checkExactAlarmPermission(alarmData: AlarmData) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                val intent = Intent(
+                    Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                    Uri.parse("package:$packageName")
+                )
+                startActivityForResult(intent, REQUEST_CODE_EXACT_ALARM)
+            } else {
+                setAlarm(alarmData)
+            }
+        } else {
+            setAlarm(alarmData)
+        }
+    }
+    private fun setAlarm(alarmData: AlarmData) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            putExtra("ALARM_NAME", alarmData.name)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            alarmData.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, alarmData.hour)
+            set(Calendar.MINUTE, alarmData.minute)
+            set(Calendar.SECOND, 0)
+            if (before(Calendar.getInstance())) {
+                add(Calendar.DATE, 1)
+            }
+        }
+        if (alarmData.daysOfWeek.contains(true)) {
+            for (i in alarmData.daysOfWeek.indices) {
+                if (alarmData.daysOfWeek[i]) {
+                    calendar.set(Calendar.DAY_OF_WEEK, i + 1)
+                    alarmManager.setRepeating(
+                        AlarmManager.RTC_WAKEUP, calendar.timeInMillis,
+                        AlarmManager.INTERVAL_DAY * 7, pendingIntent
+                    )
+                }
+            }
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        }
+    }
+    private fun cancelAlarm(alarmData: AlarmData) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            alarmData.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+    }
+
     private fun modifyAlarmInList(index: Int, alarmData: AlarmData, time: String) {
         val alarmView = layoutInflater.inflate(R.layout.alarm_item, alarmListLayout, false)
         val alarmLabelTextView = alarmView.findViewById<TextView>(R.id.alarmLabelTextView)
@@ -179,6 +247,11 @@ class SetAlarm : AppCompatActivity() {
         alarmSwitch.setOnCheckedChangeListener { _, isChecked ->
             alarmData.isEnabled = isChecked
             updateAlarm(index, alarmData)
+            if (isChecked) {
+                setAlarm(alarmData)
+            } else {
+                cancelAlarm(alarmData)
+            }
         }
 
         alarmListLayout.removeViewAt(index)

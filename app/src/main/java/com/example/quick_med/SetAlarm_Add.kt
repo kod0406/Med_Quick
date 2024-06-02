@@ -31,7 +31,6 @@ class SetAlarm_Add : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_set_alarm_2)                     //알람 수정 (alarm_2)
-        requestNotificationPermission(this)
 
         // 뷰 초기화
         spinnerAmPm = findViewById(R.id.spinner_am_pm)
@@ -202,11 +201,5 @@ class SetAlarm_Add : AppCompatActivity() {
         }
     }
 
-    fun requestNotificationPermission(activity: Activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(activity, "android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity, arrayOf("android.permission.POST_NOTIFICATIONS"), 1)
-            }
-        }
-    }
+
 }

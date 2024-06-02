@@ -1,19 +1,17 @@
 package com.example.quick_med
 
-
-import MedicineAdapter
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
-import android.widget.Toast
-import com.example.quick_med.Medicine
 
 class Search_Med : AppCompatActivity() {
 
