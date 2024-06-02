@@ -25,11 +25,15 @@ class SetAlarm : AppCompatActivity() {
     }
 
     private lateinit var alarmListLayout: LinearLayout // 알람 목록 레이아웃
+    private lateinit var sharedPreferences: SharedPreferences
+    private val alarmList: MutableList<AlarmData> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge() // 엣지투엣지 활성화
         setContentView(R.layout.activity_set_alarm_0) // 레이아웃 설정
+
+        sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
 
         // 시스템 바 패딩 설정
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -60,8 +64,8 @@ class SetAlarm : AppCompatActivity() {
 
     // 저장된 알람 불러오기
     private fun loadAlarms() {
-        val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
-        val alarmList = getAlarmList(sharedPreferences)
+        alarmList.clear()
+        alarmList.addAll(getAlarmList(sharedPreferences))
 
         for (alarmData in alarmList) {
             val amPm = if (alarmData.hour >= 12) "PM" else "AM"
@@ -83,17 +87,28 @@ class SetAlarm : AppCompatActivity() {
         }
     }
 
+    // 알람 목록 저장하기
+    private fun saveAlarms() {
+        val editor = sharedPreferences.edit()
+        val json = Gson().toJson(alarmList)
+        editor.putString("ALARM_LIST", json)
+        editor.apply()
+    }
+
     // 다른 액티비티에서 결과 받기
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val label = data?.getStringExtra("ALARM_NAME")
-            val hour = data?.getIntExtra("ALARM_HOUR", -1)
-            val minute = data?.getIntExtra("ALARM_MINUTE", -1)
+            val hour = data?.getIntExtra("ALARM_HOUR", -1) ?: -1
+            val minute = data?.getIntExtra("ALARM_MINUTE", -1) ?: -1
+            val repeatDays = data?.getBooleanArrayExtra("ALARM_REPEAT_DAYS") ?: BooleanArray(7) { false } // 기본값은 일주일 반복 안함
             if (label != null && hour != -1 && minute != -1) {
                 val time = String.format("%02d:%02d", hour, minute)
-                val alarmData = AlarmData(label, hour, minute)
-                addAlarmToList(alarmData, time) // 알람 목록에 추가
+                val newAlarm = AlarmData(label, hour, minute, repeatDays)
+                alarmList.add(newAlarm)
+                saveAlarms() // 알람 목록 저장
+                addAlarmToList(newAlarm, time) // 알람 목록에 추가
             }
         }
     }
@@ -105,20 +120,10 @@ class SetAlarm : AppCompatActivity() {
         val alarmLabelTextView = alarmView.findViewById<TextView>(R.id.alarmLabelTextView)
         val alarmTimeTextView = alarmView.findViewById<TextView>(R.id.alarmTimeTextView)
 
+
         alarmLabelTextView.text = alarmData.name
         alarmTimeTextView.text = time
 
-        // 알람 수정 화면 표시
-        alarmView.setOnClickListener {
-            val dialog = SetAlarmModify().apply {
-                arguments = Bundle().apply {
-                    putString("ALARM_NAME", alarmData.name)
-                    putInt("ALARM_HOUR", alarmData.hour)
-                    putInt("ALARM_MINUTE", alarmData.minute)
-                }
-            }
-            dialog.show(supportFragmentManager, "SetAlarmModify")
-        }
 
         alarmListLayout.addView(alarmView, 0) // 알람 목록에 뷰 추가
     }

@@ -127,6 +127,7 @@ class SetAlarm_Add : AppCompatActivity() {
             putExtra("ALARM_NAME", alarmName)
             putExtra("ALARM_HOUR", hour)
             putExtra("ALARM_MINUTE", minute)
+            putExtra("ALARM_REPEAT_DAYS", repeatDays)
         }
         setResult(Activity.RESULT_OK, resultIntent)
         finish()
