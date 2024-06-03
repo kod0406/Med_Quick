@@ -116,16 +116,18 @@ class MainActivity : AppCompatActivity() {
         // Show loading text and hide interaction list initially
         interactionListView.visibility = ListView.GONE
         loadingTextView.visibility = TextView.VISIBLE
+        placeholder2.visibility = TextView.GONE
 
-        // Schedule interactionListView to be shown after 5 seconds
+        // Schedule interactionListView and placeholder2 to be shown after 5 seconds
         handler.postDelayed({
             interactionListView.visibility = ListView.VISIBLE
             loadingTextView.visibility = TextView.GONE
+            placeholder2.visibility = TextView.VISIBLE
         }, 5000)
     }
 
     private fun updateDateTime() {
-        val dateFormat = SimpleDateFormat("M월 d일 E요일", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("M월 d일 E요일", Locale.KOREA)
         val currentDate = dateFormat.format(Date())
         dateTextView.text = currentDate
     }
