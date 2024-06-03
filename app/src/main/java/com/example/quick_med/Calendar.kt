@@ -12,6 +12,7 @@ class Calendar : AppCompatActivity() {
     private lateinit var calendarView: CalendarView
     private lateinit var alarmTextTime: TextView
     private lateinit var alarmTextName: TextView
+    private lateinit var alarmTextCheck: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +22,7 @@ class Calendar : AppCompatActivity() {
         calendarView = findViewById(R.id.Calendar)
         alarmTextTime = findViewById(R.id.Alarm_Time)
         alarmTextName = findViewById(R.id.Alarm_Name)
+        alarmTextCheck = findViewById(R.id.Alarm_Check)
 
         // 날짜 선택 리스너 설정
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
@@ -46,6 +48,7 @@ class Calendar : AppCompatActivity() {
             // 선택된 날짜의 요일에 알람이 있는지 확인하고 텍스트 초기화
             alarmTextName.text = ""
             alarmTextTime.text = ""
+            alarmTextCheck.text = ""
             if (alarmName != null && hour != -1 && minute != -1 && repeatDays[dayOfWeek - 1]) {
                 //val displayHour = if (hour > 12) hour - 12 else if (hour == 0) 12 else hour
                 val displayMinute = String.format("%02d", minute)
@@ -53,9 +56,11 @@ class Calendar : AppCompatActivity() {
                 //val alarmInfo = "$displayHour:$displayMinute $amPm : $alarmName\n"
                 alarmTextName.text = alarmName
                 alarmTextTime.text = "$hour:$displayMinute"
+                alarmTextCheck.text = "미구현"
             } else {
                 alarmTextName.text = "선택된 날짜에 알람이 없습니다."
                 alarmTextTime.text = " "
+                alarmTextCheck.text = " "
             }
         }
     }

@@ -18,6 +18,49 @@
         android:timePickerMode="spinner"
         android:layout_marginTop="16dp" />
 
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="7">
+
+        <CheckBox
+            android:id="@+id/checkBox_sunday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="일"/>
+        <CheckBox
+            android:id="@+id/checkBox_monday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="월"/>
+        <CheckBox
+            android:id="@+id/checkBox_tuesday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="화"/>
+        <CheckBox
+            android:id="@+id/checkBox_wednesday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="수"/>
+        <CheckBox
+            android:id="@+id/checkBox_thursday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="목"/>
+        <CheckBox
+            android:id="@+id/checkBox_friday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="금"/>
+        <CheckBox
+            android:id="@+id/checkBox_saturday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="토"/>
+    </GridLayout>
+
+
     <Switch
         android:id="@+id/switch_enable_alarm"
         android:layout_width="wrap_content"
@@ -40,3 +83,4 @@
         android:layout_marginTop="16dp" />
 
 </LinearLayout>
+

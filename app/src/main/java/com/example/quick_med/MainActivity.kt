@@ -1,8 +1,13 @@
 package com.example.quick_med
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +17,7 @@ import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
@@ -110,16 +116,18 @@ class MainActivity : AppCompatActivity() {
         // Show loading text and hide interaction list initially
         interactionListView.visibility = ListView.GONE
         loadingTextView.visibility = TextView.VISIBLE
+        placeholder2.visibility = TextView.GONE
 
-        // Schedule interactionListView to be shown after 5 seconds
+        // Schedule interactionListView and placeholder2 to be shown after 5 seconds
         handler.postDelayed({
             interactionListView.visibility = ListView.VISIBLE
             loadingTextView.visibility = TextView.GONE
+            placeholder2.visibility = TextView.VISIBLE
         }, 5000)
     }
 
     private fun updateDateTime() {
-        val dateFormat = SimpleDateFormat("M월 d일 E요일", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("M월 d일 E요일", Locale.KOREA)
         val currentDate = dateFormat.format(Date())
         dateTextView.text = currentDate
     }
@@ -235,3 +243,4 @@ class MainActivity : AppCompatActivity() {
         builder.create().show()
     }
 }
+
