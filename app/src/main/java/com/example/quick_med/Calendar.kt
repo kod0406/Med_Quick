@@ -1,66 +1,139 @@
 package com.example.quick_med
 
-import android.content.Context
 import android.os.Bundle
-import android.widget.CalendarView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import java.util.Calendar
+import android.widget.ListView
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView
+import com.prolificinteractive.materialcalendarview.CalendarDay
 
 class Calendar : AppCompatActivity() {
 
-    private lateinit var calendarView: CalendarView
-    private lateinit var alarmTextTime: TextView
-    private lateinit var alarmTextName: TextView
-    private lateinit var alarmTextCheck: TextView
+    private lateinit var calendarView: MaterialCalendarView
+    private lateinit var medicineListView: ListView
+    private lateinit var btnAddMedicine: Button
+    private lateinit var btnSave: Button
+    private lateinit var medicineAdapter: MedicineCalendarAdapter
+    private val medicineData = mutableMapOf<CalendarDay, MutableList<MedicineCalendar>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_calendar)
 
-        // CalendarView 초기화
-        calendarView = findViewById(R.id.Calendar)
-        alarmTextTime = findViewById(R.id.Alarm_Time)
-        alarmTextName = findViewById(R.id.Alarm_Name)
-        alarmTextCheck = findViewById(R.id.Alarm_Check)
+        calendarView = findViewById(R.id.calendarView)
+        medicineListView = findViewById(R.id.medicineListView)
+        btnAddMedicine = findViewById(R.id.btnAddMedicine)
+        btnSave = findViewById(R.id.btnSave)
 
-        // 날짜 선택 리스너 설정
-        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            val selectedDate = "$year/${month + 1}/$dayOfMonth"
-            //Toast.makeText(this, "선택된 날짜: $selectedDate", Toast.LENGTH_SHORT).show()
+        medicineAdapter = MedicineCalendarAdapter(this, mutableListOf())
+        medicineListView.adapter = medicineAdapter
 
-            // 알람 정보 불러오기
-            val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
-            val alarmName = sharedPreferences.getString("ALARM_NAME", null)
-            val hour = sharedPreferences.getInt("ALARM_HOUR", -1)
-            val minute = sharedPreferences.getInt("ALARM_MINUTE", -1)
-            val repeatDays = BooleanArray(7)
-            for (i in 0 until 7) {
-                repeatDays[i] = sharedPreferences.getBoolean("ALARM_REPEAT_$i", false)
+        btnAddMedicine.setOnClickListener {
+            showAddMedicineDialog()
+        }
+
+        btnSave.setOnClickListener {
+            saveMedicinesForDate()
+        }
+
+        calendarView.setOnDateChangedListener { _, date, _ ->
+            loadMedicinesForDate(date)
+        }
+
+        medicineListView.setOnItemClickListener { _, _, position, _ ->
+            showDeleteMedicineDialog(position)
+        }
+
+        // Initialize with selected date or today's date
+        loadMedicinesForDate(calendarView.selectedDate ?: CalendarDay.today())
+
+        val medicineDataStorage = MedicineDataStorage(this)
+        medicineData.putAll(medicineDataStorage.loadAllMedicineData())
+        updateCalendar()
+    }
+
+    private fun showAddMedicineDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Add Medicine")
+
+        val input = EditText(this)
+        builder.setView(input)
+
+        builder.setPositiveButton("OK", null) // OnClickListener를 null로 설정합니다.
+
+        builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+
+        val dialog = builder.create()
+        dialog.setOnShowListener {
+            val button = (it as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE)
+            button.setOnClickListener {
+                val medicineName = input.text.toString()
+                if (medicineName.isEmpty()) {
+                    // 이름이 입력되지 않았을 경우, 메시지를 표시합니다.
+                    Toast.makeText(this, "이름을 입력하세요.", Toast.LENGTH_SHORT).show()
+                } else {
+                    // 이름이 입력되었을 경우, 약품을 추가하고 대화 상자를 닫습니다.
+                    val newMedicine = MedicineCalendar(medicineName, false)
+                    val updatedList = medicineAdapter.getMedicines().toMutableList()
+                    updatedList.add(newMedicine)
+                    medicineAdapter.updateMedicines(updatedList)
+                    dialog.dismiss() // 'it' 대신 'dialog'를 사용하여 dismiss() 메소드를 호출합니다.
+                }
             }
+        }
+        dialog.show()
+    }
 
-            // 선택된 날짜의 요일 계산
-            val calendar = Calendar.getInstance().apply {
-                set(year, month, dayOfMonth)
-            }
-            val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) // 일요일 = 1, 월요일 = 2, ..., 토요일 = 7
+    private fun showDeleteMedicineDialog(position: Int) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Delete Medicine")
+        builder.setMessage("Are you sure you want to delete this medicine?")
 
-            // 선택된 날짜의 요일에 알람이 있는지 확인하고 텍스트 초기화
-            alarmTextName.text = ""
-            alarmTextTime.text = ""
-            alarmTextCheck.text = ""
-            if (alarmName != null && hour != -1 && minute != -1 && repeatDays[dayOfWeek - 1]) {
-                //val displayHour = if (hour > 12) hour - 12 else if (hour == 0) 12 else hour
-                val displayMinute = String.format("%02d", minute)
-                //val amPm = if (hour >= 12) "PM" else "AM"
-                //val alarmInfo = "$displayHour:$displayMinute $amPm : $alarmName\n"
-                alarmTextName.text = alarmName
-                alarmTextTime.text = "$hour:$displayMinute"
-                alarmTextCheck.text = "미구현"
-            } else {
-                alarmTextName.text = "선택된 날짜에 알람이 없습니다."
-                alarmTextTime.text = " "
-                alarmTextCheck.text = " "
+        builder.setPositiveButton("Yes") { dialog, _ ->
+            val updatedList = medicineAdapter.getMedicines().toMutableList()
+            updatedList.removeAt(position)
+            medicineAdapter.updateMedicines(updatedList)
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton("No") { dialog, _ -> dialog.cancel() }
+
+        builder.show()
+    }
+
+    private fun saveMedicinesForDate() {
+        val selectedDate = calendarView.selectedDate ?: return
+        val medicines = medicineAdapter.getMedicines()
+        if (medicines.isEmpty()) {
+            Toast.makeText(this, "저장된 약품이 없습니다.", Toast.LENGTH_SHORT).show()
+        } else {
+            val medicineDataStorage = MedicineDataStorage(this)
+            medicineDataStorage.saveMedicineData(selectedDate.toString(), medicines)
+            medicineData[selectedDate] = medicines.toMutableList() // medicineData 맵을 업데이트합니다.
+            updateCalendar()
+        }
+    }
+
+    private fun loadMedicinesForDate(date: CalendarDay) {
+        val medicineDataStorage = MedicineDataStorage(this)
+        val medicinesForDate = medicineDataStorage.loadMedicineData(date.toString())
+        medicineAdapter.updateMedicines(medicinesForDate)
+        updateCalendar() // 색상 정보를 업데이트합니다.
+    }
+
+    private fun updateCalendar() {
+        calendarView.removeDecorators()
+        medicineData.forEach { (date, medicines) ->
+            if (medicines.isNotEmpty()) { // 약품 리스트가 비어 있지 않은 경우에만 색상을 업데이트합니다.
+                val color = when (medicines.count { it.isChecked }) {
+                    medicines.size -> android.graphics.Color.GREEN
+                    in 1 until medicines.size -> android.graphics.Color.YELLOW
+                    else -> android.graphics.Color.RED
+                }
+                calendarView.addDecorator(CustomCircleCalendarDecorator(date, color))
             }
         }
     }
