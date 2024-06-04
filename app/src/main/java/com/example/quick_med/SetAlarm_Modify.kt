@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Switch
 import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
 import java.util.Calendar
@@ -19,7 +18,6 @@ class SetAlarm_Modify : AppCompatActivity() {
 
     private lateinit var alarmLabelEditText: EditText
     private lateinit var alarmTimePicker: TimePicker
-    private lateinit var enableAlarmSwitch: Switch
     private lateinit var deleteButton: Button
     private lateinit var saveButton: Button
 
@@ -31,7 +29,6 @@ class SetAlarm_Modify : AppCompatActivity() {
 
         alarmLabelEditText = findViewById(R.id.alarmLabelEditText)
         alarmTimePicker = findViewById(R.id.alarmTimePicker)
-        enableAlarmSwitch = findViewById(R.id.switch_enable_alarm)
         deleteButton = findViewById(R.id.deleteButton)
         saveButton = findViewById(R.id.saveButton)
 
@@ -39,7 +36,6 @@ class SetAlarm_Modify : AppCompatActivity() {
         alarmLabelEditText.setText(intent.getStringExtra("ALARM_NAME"))
         alarmTimePicker.hour = intent.getIntExtra("ALARM_HOUR", 0)
         alarmTimePicker.minute = intent.getIntExtra("ALARM_MINUTE", 0)
-        enableAlarmSwitch.isChecked = intent.getBooleanExtra("ALARM_ENABLED", true)
         alarmIndex = intent.getIntExtra("ALARM_INDEX", -1)
 
         deleteButton.setOnClickListener {
@@ -55,9 +51,8 @@ class SetAlarm_Modify : AppCompatActivity() {
             val alarmName = alarmLabelEditText.text.toString()
             val hour = alarmTimePicker.hour
             val minute = alarmTimePicker.minute
-            val isEnabled = enableAlarmSwitch.isChecked
 
-            val alarmData = AlarmData(alarmName, hour, minute, BooleanArray(7), isEnabled)
+            val alarmData = AlarmData(alarmName, hour, minute, true) // 활성화 상태는 항상 true로 설정
             cancelAlarm(alarmIndex) // 기존 알람 취소
             setAlarm(alarmData) // 새로운 알람 설정
 
@@ -66,7 +61,6 @@ class SetAlarm_Modify : AppCompatActivity() {
                 putExtra("ALARM_HOUR", hour)
                 putExtra("ALARM_MINUTE", minute)
                 putExtra("ALARM_INDEX", alarmIndex)
-                putExtra("ALARM_ENABLED", isEnabled)
             }
             setResult(Activity.RESULT_OK, resultIntent)
             finish()
@@ -115,5 +109,3 @@ class SetAlarm_Modify : AppCompatActivity() {
         }
     }
 }
-
-

@@ -51,55 +51,6 @@
             android:inputType="textPersonName"
             android:layout_marginBottom="8dp"/>
 
-        <!-- 반복 요일 선택 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="반복 요일"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp"/>
-
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="7">
-
-            <CheckBox
-                android:id="@+id/checkBox_sunday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="일"/>
-            <CheckBox
-                android:id="@+id/checkBox_monday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="월"/>
-            <CheckBox
-                android:id="@+id/checkBox_tuesday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="화"/>
-            <CheckBox
-                android:id="@+id/checkBox_wednesday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="수"/>
-            <CheckBox
-                android:id="@+id/checkBox_thursday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="목"/>
-            <CheckBox
-                android:id="@+id/checkBox_friday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="금"/>
-            <CheckBox
-                android:id="@+id/checkBox_saturday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="토"/>
-        </GridLayout>
 
         <!-- 알람 생성 버튼 -->
         <Button
@@ -121,30 +72,7 @@
             android:padding="12dp"/>
     </LinearLayout>
 
-    <!-- 현재 설정된 알람 표시 섹션 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="32dp">
 
-        <TextView
-            android:id="@+id/textView_current_alarm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="현재 설정된 알람 없음"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp"/>
-
-        <Button
-            android:id="@+id/button_delete_alarm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="알람 삭제"
-            android:layout_marginTop="16dp"
-            android:textSize="18sp"
-            android:padding="12dp"/>
-    </LinearLayout>
 
 </LinearLayout>
 

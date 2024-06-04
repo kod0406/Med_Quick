@@ -4,6 +4,5 @@ data class AlarmData(
     val name: String,
     val hour: Int,
     val minute: Int,
-    val daysOfWeek: BooleanArray,
-    var isEnabled: Boolean // 알람 활성화 상태를 저장하는 변수
+    var isEnabled: Boolean = true // 기본값을 true로 설정
 )
