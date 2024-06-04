@@ -7,7 +7,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
-//import android.widget.TextView
+import android.widget.TextView
 
 class AlarmPopupActivity : Activity() {
 
