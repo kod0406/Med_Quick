@@ -20,6 +20,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView
+import com.prolificinteractive.materialcalendarview.CalendarDay
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,6 +36,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dateTextView: TextView
     private lateinit var loadingTextView: TextView
     private val handler = Handler(Looper.getMainLooper())
+    private lateinit var mainCalendarView: MaterialCalendarView
+    private lateinit var medicineDataStorage: MedicineDataStorage
+    private val medicineData = mutableMapOf<CalendarDay, MutableList<MedicineCalendar>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +58,8 @@ class MainActivity : AppCompatActivity() {
         val medicineListView = findViewById<ListView>(R.id.medicineListView)
         interactionListView = findViewById(R.id.interactionListView)
         loadingTextView = findViewById(R.id.loadingTextView)
+        mainCalendarView = findViewById(R.id.mainCalendarView)
+        medicineDataStorage = MedicineDataStorage(this)
 
         // Set up buttons
         buttonAlarm.setOnClickListener {
@@ -104,6 +111,11 @@ class MainActivity : AppCompatActivity() {
 
         // Schedule checkDrugInteractions to run after 3 seconds
         handler.postDelayed({ checkDrugInteractions() }, 3000)
+
+        // Load and update calendar data
+        val medicineDataStorage = MedicineDataStorage(this)
+        medicineData.putAll(medicineDataStorage.loadAllMedicineData())
+        updateCalendar()
     }
 
     override fun onResume() {
@@ -124,6 +136,7 @@ class MainActivity : AppCompatActivity() {
             loadingTextView.visibility = TextView.GONE
             placeholder2.visibility = TextView.VISIBLE
         }, 5000)
+        updateCalendar()
     }
 
     private fun updateDateTime() {
@@ -242,5 +255,28 @@ class MainActivity : AppCompatActivity() {
         builder.setPositiveButton("확인") { dialog, _ -> dialog.dismiss() }
         builder.create().show()
     }
-}
 
+    private fun loadMedicinesForDate(date: CalendarDay) {
+        val medicinesForDate = medicineDataStorage.loadMedicineData(date.toString())
+        if (medicinesForDate.isNotEmpty()) {
+            medicineData[date] = medicinesForDate.toMutableList()
+        } else {
+            medicineData.remove(date)
+        }
+        updateCalendar()
+    }
+
+    private fun updateCalendar() {
+        mainCalendarView.removeDecorators()
+        medicineData.forEach { (date, medicines) ->
+            if (medicines.isNotEmpty()) {
+                val color = when (medicines.count { it.isChecked }) {
+                    medicines.size -> android.graphics.Color.GREEN
+                    in 1 until medicines.size -> android.graphics.Color.YELLOW
+                    else -> android.graphics.Color.RED
+                }
+                mainCalendarView.addDecorator(CustomCircleCalendarDecorator(date, color))
+            }
+        }
+    }
+}
