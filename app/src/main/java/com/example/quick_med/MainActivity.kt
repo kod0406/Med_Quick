@@ -137,6 +137,9 @@ class MainActivity : AppCompatActivity() {
             placeholder2.visibility = TextView.VISIBLE
         }, 5000)
         updateCalendar()
+        val medicineDataStorage = MedicineDataStorage(this)
+        medicineData.putAll(medicineDataStorage.loadAllMedicineData())
+        updateCalendar()
     }
 
     private fun updateDateTime() {

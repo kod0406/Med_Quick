@@ -159,6 +159,13 @@ class SetAlarm : AppCompatActivity() {
         alarmTimeTextView.text = time
         alarmSwitch.isChecked = alarmData.isEnabled
 
+        val alarmDaysTextView = alarmView.findViewById<TextView>(R.id.alarmDaysTextView)
+        val daysArray = arrayOf("일", "월", "화", "수", "목", "금", "토")
+        val selectedDays = alarmData.daysOfWeek.mapIndexed { index, isSelected ->
+            if (isSelected) daysArray[index] else ""
+        }.filter { it.isNotEmpty() }
+        alarmDaysTextView.text = selectedDays.joinToString(", ")
+
         alarmSwitch.setOnCheckedChangeListener { _, isChecked ->
             alarmData.isEnabled = isChecked
             updateAlarm(index, alarmData)
