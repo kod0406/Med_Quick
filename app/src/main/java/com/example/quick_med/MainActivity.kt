@@ -130,12 +130,15 @@ class MainActivity : AppCompatActivity() {
         loadingTextView.visibility = TextView.VISIBLE
         placeholder2.visibility = TextView.GONE
 
-        // Schedule interactionListView and placeholder2 to be shown after 5 seconds
+        // Schedule interactionListView to be shown after 5 seconds
         handler.postDelayed({
             interactionListView.visibility = ListView.VISIBLE
             loadingTextView.visibility = TextView.GONE
-            placeholder2.visibility = TextView.VISIBLE
+            updateInteractionPlaceholderVisibility()
         }, 5000)
+        updateCalendar()
+        val medicineDataStorage = MedicineDataStorage(this)
+        medicineData.putAll(medicineDataStorage.loadAllMedicineData())
         updateCalendar()
     }
 
@@ -188,11 +191,13 @@ class MainActivity : AppCompatActivity() {
     private fun updatePlaceholderVisibility() {
         if (adapter.isEmpty) {
             placeholder.visibility = TextView.VISIBLE
-            placeholder2.visibility = TextView.VISIBLE
         } else {
             placeholder.visibility = TextView.GONE
-            placeholder2.visibility = TextView.GONE
         }
+    }
+
+    private fun updateInteractionPlaceholderVisibility() {
+        placeholder2.visibility = if (interactionAdapter.isEmpty) TextView.VISIBLE else TextView.GONE
     }
 
     private fun checkDrugInteractions() {
@@ -222,6 +227,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             interactionAdapter.notifyDataSetChanged()
+            updateInteractionPlaceholderVisibility()
         }
     }
 

@@ -13,13 +13,20 @@
 
     <TextView
         android:id="@+id/alarmLabelTextView"
-        android:layout_width="0dp"
+        android:layout_width="157dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:paddingEnd="16dp"
         android:text="알람 이름"
         android:textSize="18sp"
-        android:textStyle="bold"
-        android:paddingEnd="16dp"/>
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/alarmDaysTextView"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:paddingEnd="16dp"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/alarmTimeTextView"

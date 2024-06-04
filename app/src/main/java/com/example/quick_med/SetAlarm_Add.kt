@@ -88,10 +88,19 @@ class SetAlarm_Add : AppCompatActivity() {
 
         // 선택된 요일 확인
         val repeatDays = BooleanArray(7)
+        var isDaySelected = false
         for (i in dayCheckBoxes.indices) {
             repeatDays[i] = dayCheckBoxes[i].isChecked
+            if (repeatDays[i]) {
+                isDaySelected = true
+            }
         }
 
+        // 요일 선택을 확인합니다.
+        if (!isDaySelected) {
+            Toast.makeText(this, "요일을 설정해 주세요.", Toast.LENGTH_SHORT).show()
+            return
+        }
         // 알람 데이터를 SharedPreferences에 저장
         val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
