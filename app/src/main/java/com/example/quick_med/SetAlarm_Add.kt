@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -42,7 +41,6 @@ class SetAlarm_Add : AppCompatActivity() {
         val buttonCancelAlarm: Button = findViewById(R.id.button_cancel_alarm)
         buttonCreateAlarm.setOnClickListener { setAlarm() }
         buttonCancelAlarm.setOnClickListener { finish() }
-
     }
 
     private fun setAlarm() {
@@ -58,6 +56,14 @@ class SetAlarm_Add : AppCompatActivity() {
             hour = 0
         }
 
+        // 알람 데이터를 SharedPreferences에 저장
+        val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val alarmList = getAlarmList(sharedPreferences)
+        alarmList.add(AlarmData(alarmName, hour, minute, true)) // 활성화 상태 저장
+        editor.putString("ALARM_LIST", Gson().toJson(alarmList))
+        editor.apply()
+
         // 선택된 시간으로 캘린더 설정
         val calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, hour)
@@ -67,14 +73,6 @@ class SetAlarm_Add : AppCompatActivity() {
                 add(Calendar.DATE, 1) // 현재 시간보다 이전이면 다음 날로 설정
             }
         }
-
-        // 알람 데이터를 SharedPreferences에 저장
-        val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        val alarmList = getAlarmList(sharedPreferences)
-        alarmList.add(AlarmData(alarmName, hour, minute, true)) // 활성화 상태는 true로 설정
-        editor.putString("ALARM_LIST", Gson().toJson(alarmList))
-        editor.apply()
 
         // 알람 설정
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -112,7 +110,4 @@ class SetAlarm_Add : AppCompatActivity() {
             mutableListOf()
         }
     }
-
-
-    }
-
+}

@@ -52,7 +52,7 @@ class SetAlarm_Modify : AppCompatActivity() {
             val hour = alarmTimePicker.hour
             val minute = alarmTimePicker.minute
 
-            val alarmData = AlarmData(alarmName, hour, minute, true) // 활성화 상태는 항상 true로 설정
+            val alarmData = AlarmData(alarmName, hour, minute, true) // 활성화 상태 저장
             cancelAlarm(alarmIndex) // 기존 알람 취소
             setAlarm(alarmData) // 새로운 알람 설정
 
