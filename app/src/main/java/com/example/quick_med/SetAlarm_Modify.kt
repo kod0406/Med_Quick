@@ -9,11 +9,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Switch
 import android.widget.TimePicker
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.util.Calendar
 
@@ -24,7 +22,6 @@ class SetAlarm_Modify : AppCompatActivity() {
     private lateinit var enableAlarmSwitch: Switch
     private lateinit var deleteButton: Button
     private lateinit var saveButton: Button
-    private lateinit var daysOfWeekCheckBoxes: List<CheckBox>
 
     private var alarmIndex: Int = -1
 
@@ -38,26 +35,12 @@ class SetAlarm_Modify : AppCompatActivity() {
         deleteButton = findViewById(R.id.deleteButton)
         saveButton = findViewById(R.id.saveButton)
 
-        daysOfWeekCheckBoxes = listOf(
-            findViewById(R.id.checkBox_sunday),
-            findViewById(R.id.checkBox_monday),
-            findViewById(R.id.checkBox_tuesday),
-            findViewById(R.id.checkBox_wednesday),
-            findViewById(R.id.checkBox_thursday),
-            findViewById(R.id.checkBox_friday),
-            findViewById(R.id.checkBox_saturday)
-        )
-
         val intent = intent
         alarmLabelEditText.setText(intent.getStringExtra("ALARM_NAME"))
         alarmTimePicker.hour = intent.getIntExtra("ALARM_HOUR", 0)
         alarmTimePicker.minute = intent.getIntExtra("ALARM_MINUTE", 0)
         enableAlarmSwitch.isChecked = intent.getBooleanExtra("ALARM_ENABLED", true)
         alarmIndex = intent.getIntExtra("ALARM_INDEX", -1)
-        val daysOfWeek = intent.getBooleanArrayExtra("ALARM_DAYS") ?: BooleanArray(7)
-        daysOfWeekCheckBoxes.forEachIndexed { index, checkBox ->
-            checkBox.isChecked = daysOfWeek[index]
-        }
 
         deleteButton.setOnClickListener {
             cancelAlarm(alarmIndex)
@@ -74,13 +57,7 @@ class SetAlarm_Modify : AppCompatActivity() {
             val minute = alarmTimePicker.minute
             val isEnabled = enableAlarmSwitch.isChecked
 
-            val daysOfWeek = daysOfWeekCheckBoxes.map { it.isChecked }.toBooleanArray()
-            if (daysOfWeek.none { it }) {
-                Toast.makeText(this, "요일을 설정해 주세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val alarmData = AlarmData(alarmName, hour, minute, daysOfWeek, isEnabled)
+            val alarmData = AlarmData(alarmName, hour, minute, BooleanArray(7), isEnabled)
             cancelAlarm(alarmIndex) // 기존 알람 취소
             setAlarm(alarmData) // 새로운 알람 설정
 
@@ -90,10 +67,8 @@ class SetAlarm_Modify : AppCompatActivity() {
                 putExtra("ALARM_MINUTE", minute)
                 putExtra("ALARM_INDEX", alarmIndex)
                 putExtra("ALARM_ENABLED", isEnabled)
-                putExtra("ALARM_DAYS", daysOfWeek)
             }
             setResult(Activity.RESULT_OK, resultIntent)
-            Toast.makeText(this, "수정되었습니다.", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
@@ -140,3 +115,5 @@ class SetAlarm_Modify : AppCompatActivity() {
         }
     }
 }
+
+
