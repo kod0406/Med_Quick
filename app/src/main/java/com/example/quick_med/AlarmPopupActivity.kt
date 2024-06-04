@@ -1,6 +1,7 @@
 package com.example.quick_med
 
 import android.app.Activity
+import android.content.Context
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
@@ -10,7 +11,20 @@ import android.widget.TextView
 
 class AlarmPopupActivity : Activity() {
 
-    private lateinit var ringtone: Ringtone
+    companion object {
+        private lateinit var ringtone: Ringtone
+        fun playRingtone(context: Context) {
+            val alarmUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+            ringtone = RingtoneManager.getRingtone(context, alarmUri)
+            ringtone.play()
+        }
+
+        fun stopRingtone() {
+            if (this::ringtone.isInitialized && ringtone.isPlaying) {
+                ringtone.stop()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,21 +34,17 @@ class AlarmPopupActivity : Activity() {
         val alarmNameTextView: TextView = findViewById(R.id.alarmNameTextView)
         alarmNameTextView.text = alarmName
 
-        val alarmUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        ringtone = RingtoneManager.getRingtone(this, alarmUri)
-        ringtone.play()
+        playRingtone(this)
 
         val stopAlarmButton: Button = findViewById(R.id.stopAlarmButton)
         stopAlarmButton.setOnClickListener {
-            ringtone.stop()
+            stopRingtone()
             finish()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (ringtone.isPlaying) {
-            ringtone.stop()
-        }
+        stopRingtone()
     }
 }
