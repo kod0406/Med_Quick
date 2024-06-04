@@ -6,13 +6,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.Calendar
@@ -23,8 +20,6 @@ class SetAlarm_Add : AppCompatActivity() {
     private lateinit var numberPickerHour: NumberPicker
     private lateinit var numberPickerMinute: NumberPicker
     private lateinit var editTextAlarmName: EditText
-    private lateinit var dayCheckBoxes: Array<CheckBox>
-    private lateinit var textViewCurrentAlarm: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,16 +30,6 @@ class SetAlarm_Add : AppCompatActivity() {
         numberPickerHour = findViewById(R.id.numberPicker_hour)
         numberPickerMinute = findViewById(R.id.numberPicker_minute)
         editTextAlarmName = findViewById(R.id.editText_alarm_name)
-        textViewCurrentAlarm = findViewById(R.id.textView_current_alarm)
-        dayCheckBoxes = arrayOf(
-            findViewById(R.id.checkBox_sunday),
-            findViewById(R.id.checkBox_monday),
-            findViewById(R.id.checkBox_tuesday),
-            findViewById(R.id.checkBox_wednesday),
-            findViewById(R.id.checkBox_thursday),
-            findViewById(R.id.checkBox_friday),
-            findViewById(R.id.checkBox_saturday)
-        )
 
         // NumberPicker 범위 설정
         numberPickerHour.minValue = 1
@@ -55,12 +40,9 @@ class SetAlarm_Add : AppCompatActivity() {
         // 버튼 클릭 리스너 설정
         val buttonCreateAlarm: Button = findViewById(R.id.button_create_alarm)
         val buttonCancelAlarm: Button = findViewById(R.id.button_cancel_alarm)
-        val buttonDeleteAlarm: Button = findViewById(R.id.button_delete_alarm)
         buttonCreateAlarm.setOnClickListener { setAlarm() }
         buttonCancelAlarm.setOnClickListener { finish() }
-        buttonDeleteAlarm.setOnClickListener { deleteAlarm() }
 
-        displayCurrentAlarm()
     }
 
     private fun setAlarm() {
@@ -86,26 +68,11 @@ class SetAlarm_Add : AppCompatActivity() {
             }
         }
 
-        // 선택된 요일 확인
-        val repeatDays = BooleanArray(7)
-        var isDaySelected = false
-        for (i in dayCheckBoxes.indices) {
-            repeatDays[i] = dayCheckBoxes[i].isChecked
-            if (repeatDays[i]) {
-                isDaySelected = true
-            }
-        }
-
-        // 요일 선택을 확인합니다.
-        if (!isDaySelected) {
-            Toast.makeText(this, "요일을 설정해 주세요.", Toast.LENGTH_SHORT).show()
-            return
-        }
         // 알람 데이터를 SharedPreferences에 저장
         val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val alarmList = getAlarmList(sharedPreferences)
-        alarmList.add(AlarmData(alarmName, hour, minute, repeatDays, true)) // 활성화 상태는 true로 설정
+        alarmList.add(AlarmData(alarmName, hour, minute, true)) // 활성화 상태는 true로 설정
         editor.putString("ALARM_LIST", Gson().toJson(alarmList))
         editor.apply()
 
@@ -116,41 +83,14 @@ class SetAlarm_Add : AppCompatActivity() {
             action = "com.example.quick_med.ALARM_ACTION"
         }
 
-        if (repeatDays.contains(true)) {
-            repeatDays.forEachIndexed { index, isEnabled ->
-                if (isEnabled) {
-                    val dayOfWeekCalendar = Calendar.getInstance().apply {
-                        set(Calendar.DAY_OF_WEEK, index + 1)
-                        set(Calendar.HOUR_OF_DAY, hour)
-                        set(Calendar.MINUTE, minute)
-                        set(Calendar.SECOND, 0)
-                        if (before(Calendar.getInstance())) {
-                            add(Calendar.DATE, 7)
-                        }
-                    }
-                    val repeatingIntent = PendingIntent.getBroadcast(
-                        this,
-                        alarmName.hashCode() + index,
-                        intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                    alarmManager.setRepeating(
-                        AlarmManager.RTC_WAKEUP,
-                        dayOfWeekCalendar.timeInMillis,
-                        AlarmManager.INTERVAL_DAY * 7,
-                        repeatingIntent
-                    )
-                }
-            }
-        } else {
-            val pendingIntent = PendingIntent.getBroadcast(
-                this,
-                alarmName.hashCode(),
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            alarmName.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+
         Toast.makeText(this, "알람이 설정되었습니다", Toast.LENGTH_SHORT).show()
 
         // 설정한 알람 데이터를 인텐트에 추가하여 반환
@@ -174,42 +114,5 @@ class SetAlarm_Add : AppCompatActivity() {
     }
 
 
-    private fun deleteAlarm() {
-        // 알람 삭제
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        alarmManager.cancel(pendingIntent)
-
-        // SharedPreferences에서 알람 데이터 삭제
-        val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.clear()
-        editor.apply()
-        Toast.makeText(this, "알람이 삭제되었습니다", Toast.LENGTH_SHORT).show()
-        displayCurrentAlarm()
     }
 
-    private fun displayCurrentAlarm() {
-        // SharedPreferences에서 알람 데이터를 읽어옵니다.
-        val sharedPreferences = getSharedPreferences("AlarmPreferences", Context.MODE_PRIVATE)
-        val alarmList = getAlarmList(sharedPreferences)
-
-        if (alarmList.isNotEmpty()) {
-            val alarmData = alarmList[0]
-            val amPm = if (alarmData.hour >= 12) "PM" else "AM"
-            val displayHour =
-                if (alarmData.hour > 12) alarmData.hour - 12 else if (alarmData.hour == 0) 12 else alarmData.hour
-            val displayMinute = String.format("%02d", alarmData.minute)
-            textViewCurrentAlarm.text =
-                "현재 설정된 알람: ${alarmData.name} - $amPm $displayHour:$displayMinute"
-        } else {
-            textViewCurrentAlarm.text = "현재 설정된 알람 없음"
-        }
-    }
-}

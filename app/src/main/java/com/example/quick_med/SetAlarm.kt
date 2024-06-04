@@ -111,7 +111,7 @@ class SetAlarm : AppCompatActivity() {
 
                 if (label != null && hour != -1 && minute != -1) {
                     val time = String.format("%02d:%02d", hour, minute)
-                    val alarmData = AlarmData(label, hour, minute, BooleanArray(7), isEnabled)
+                    val alarmData = AlarmData(label, hour, minute, isEnabled)
 
                     if (requestCode == REQUEST_CODE_ADD) {
                         addAlarmToList(alarmData, time, alarmList.size)
@@ -158,13 +158,6 @@ class SetAlarm : AppCompatActivity() {
         alarmLabelTextView.text = alarmData.name
         alarmTimeTextView.text = time
         alarmSwitch.isChecked = alarmData.isEnabled
-
-        val alarmDaysTextView = alarmView.findViewById<TextView>(R.id.alarmDaysTextView)
-        val daysArray = arrayOf("일", "월", "화", "수", "목", "금", "토")
-        val selectedDays = alarmData.daysOfWeek.mapIndexed { index, isSelected ->
-            if (isSelected) daysArray[index] else ""
-        }.filter { it.isNotEmpty() }
-        alarmDaysTextView.text = selectedDays.joinToString(", ")
 
         alarmSwitch.setOnCheckedChangeListener { _, isChecked ->
             alarmData.isEnabled = isChecked
@@ -238,7 +231,6 @@ class SetAlarm : AppCompatActivity() {
         }
     }
 
-
     private fun setAlarm(alarmData: AlarmData) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !getSystemService(AlarmManager::class.java).canScheduleExactAlarms()) {
             checkExactAlarmPermission()
@@ -251,71 +243,39 @@ class SetAlarm : AppCompatActivity() {
             action = "com.example.quick_med.ALARM_ACTION"
         }
 
-        if (alarmData.daysOfWeek.contains(true)) {
-            alarmData.daysOfWeek.forEachIndexed { index, isEnabled ->
-                if (isEnabled) {
-                    val dayOfWeekCalendar = Calendar.getInstance().apply {
-                        set(Calendar.DAY_OF_WEEK, index + 1)
-                        set(Calendar.HOUR_OF_DAY, alarmData.hour)
-                        set(Calendar.MINUTE, alarmData.minute)
-                        set(Calendar.SECOND, 0)
-                        if (before(Calendar.getInstance())) {
-                            add(Calendar.DATE, 7)
-                        }
-                    }
-                    val repeatingIntent = PendingIntent.getBroadcast(
-                        this,
-                        alarmData.hashCode() + index,
-                        intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                    alarmManager.setRepeating(
-                        AlarmManager.RTC_WAKEUP,
-                        dayOfWeekCalendar.timeInMillis,
-                        AlarmManager.INTERVAL_DAY * 7,
-                        repeatingIntent
-                    )
-                    Log.d("SetAlarm", "Alarm set for ${dayOfWeekCalendar.time}")
-                }
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, alarmData.hour)
+            set(Calendar.MINUTE, alarmData.minute)
+            set(Calendar.SECOND, 0)
+            if (before(Calendar.getInstance())) {
+                add(Calendar.DATE, 1)
             }
-        } else {
-            val calendar = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, alarmData.hour)
-                set(Calendar.MINUTE, alarmData.minute)
-                set(Calendar.SECOND, 0)
-                if (before(Calendar.getInstance())) {
-                    add(Calendar.DATE, 1)
-                }
-            }
-
-            val pendingIntent = PendingIntent.getBroadcast(
-                this,
-                alarmData.hashCode(),
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-            } else {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-            }
-            Log.d("SetAlarm", "Exact alarm set for ${calendar.time}")
         }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            alarmData.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        }
+        Log.d("SetAlarm", "Exact alarm set for ${calendar.time}")
     }
+
     private fun cancelAlarm(alarmData: AlarmData) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)
-        alarmData.daysOfWeek.forEachIndexed { index, _ ->
-            val pendingIntent = PendingIntent.getBroadcast(
-                this,
-                alarmData.hashCode() + index,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            alarmManager.cancel(pendingIntent)
-        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            alarmData.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
     }
-
-
 }
