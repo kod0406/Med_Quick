@@ -127,6 +127,7 @@ class SetAlarm : AppCompatActivity() {
             }
         }
     }
+
     private fun saveAlarm(alarmData: AlarmData) {
         alarmList.add(alarmData)
         val editor = sharedPreferences.edit()
