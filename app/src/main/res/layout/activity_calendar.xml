@@ -6,12 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".Calendar">
 
+
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/calendarView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="29dp"
+        android:layout_below="@+id/textView4"
+        android:layout_marginTop="0dp"
         android:visibility="visible"
         app:mcv_showOtherDates="all" />
 
@@ -19,7 +20,10 @@
         android:id="@+id/medicineListView"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_below="@id/calendarView"
+        android:layout_above="@+id/btnSave"
+        android:layout_below="@+id/calendarView"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
         android:padding="16dp"
         android:visibility="visible" />
 
@@ -37,19 +41,37 @@
         android:id="@+id/btnAddMedicine"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/medicineListView"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="1dp"
-        android:text="Add Medicine" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="0dp"
+        android:text="기록 추가" />
 
     <Button
         android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/medicineListView"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="41dp"
-        android:text="Save" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
+        android:text="저장" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="10dp"
+        android:background="@color/material_dynamic_neutral80"
+        android:gravity="center"
+        android:text="약품 복용 기록 달력"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
 </RelativeLayout>
