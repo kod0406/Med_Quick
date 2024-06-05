@@ -66,15 +66,17 @@ class AlarmReceiver : BroadcastReceiver() {
         }
 
         val pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-
+        val alarmSound: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         val notification = NotificationCompat.Builder(context, channelId)
-            .setContentTitle("Alarm")
-            .setContentText(alarmName)
-            .setSmallIcon(R.drawable.ic_alarm)  // 적절한 아이콘으로 변경하세요
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("Med_Quick")
+            .setContentText("$alarmName 복용하셨나요? 복용 여부를 체크해주세요.")
+            .setPriority(NotificationCompat.PRIORITY_HIGH) // 헤드업 알림을 위해 HIGH로 설정
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
+            .setDefaults(NotificationCompat.DEFAULT_ALL) // 기본 소리, 진동, LED 설정
+            .setSound(alarmSound) // 커스텀 소리 설정
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // 잠금 화면에서 알림 표시
             .build()
 
         notificationManager.notify(alarmName.hashCode(), notification)

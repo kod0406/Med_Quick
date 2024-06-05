@@ -116,6 +116,8 @@ class MainActivity : AppCompatActivity() {
         val medicineDataStorage = MedicineDataStorage(this)
         medicineData.putAll(medicineDataStorage.loadAllMedicineData())
         updateCalendar()
+
+        requestPermissions()
     }
 
     override fun onResume() {
@@ -135,11 +137,34 @@ class MainActivity : AppCompatActivity() {
             interactionListView.visibility = ListView.VISIBLE
             loadingTextView.visibility = TextView.GONE
             updateInteractionPlaceholderVisibility()
+
         }, 5000)
         updateCalendar()
         val medicineDataStorage = MedicineDataStorage(this)
         medicineData.putAll(medicineDataStorage.loadAllMedicineData())
         updateCalendar()
+    }
+    private fun requestPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    Manifest.permission.INTERNET,
+                    Manifest.permission.SCHEDULE_EXACT_ALARM
+                ),
+                1
+            )
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.INTERNET,
+                    Manifest.permission.SCHEDULE_EXACT_ALARM
+                ),
+                1
+            )
+        }
     }
 
     private fun updateDateTime() {
