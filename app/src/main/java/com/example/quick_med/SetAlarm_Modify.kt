@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TimePicker
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.util.Calendar
 
@@ -55,6 +56,8 @@ class SetAlarm_Modify : AppCompatActivity() {
             val alarmData = AlarmData(alarmName, hour, minute, true) // 활성화 상태 저장
             cancelAlarm(alarmIndex) // 기존 알람 취소
             setAlarm(alarmData) // 새로운 알람 설정
+
+            Toast.makeText(this, "알람이 수정되었습니다", Toast.LENGTH_SHORT).show()
 
             val resultIntent = Intent().apply {
                 putExtra("ALARM_NAME", alarmName)

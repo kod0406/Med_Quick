@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -27,14 +28,8 @@ class AlarmReceiver : BroadcastReceiver() {
         if (alarmData?.isEnabled == true) {
             // 알람이 활성화되어 있으면 노티피케이션 생성 및 소리 울림
             showNotification(context, alarmName)
-            // 알람이 활성화되어 있으면 AlarmPopupActivity를 실행
-            val popupIntent = Intent(context, AlarmPopupActivity::class.java).apply {
-                putExtra("ALARM_NAME", alarmName)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-            context.startActivity(popupIntent)
         } else {
-            Log.d("AlarmReceiver", "Alarm is not enabled, skipping alarm popup.")
+            Log.d("AlarmReceiver", "Alarm is not enabled, skipping alarm notification.")
         }
     }
 
@@ -60,9 +55,8 @@ class AlarmReceiver : BroadcastReceiver() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        val notificationIntent = Intent(context, AlarmPopupActivity::class.java).apply {
-            putExtra("ALARM_NAME", alarmName)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        val notificationIntent = Intent(context, Calendar::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
 
         val pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
