@@ -161,6 +161,7 @@ class SetAlarm : AppCompatActivity() {
         alarmSwitch.isChecked = alarmData.isEnabled
 
         alarmSwitch.setOnCheckedChangeListener { _, isChecked ->
+            Log.d("SetAlarm", "Switch checked: $isChecked for alarm: ${alarmData.name}")
             alarmData.isEnabled = isChecked
             updateAlarm(index, alarmData)
             if (isChecked) {
@@ -195,6 +196,7 @@ class SetAlarm : AppCompatActivity() {
         alarmSwitch.isChecked = alarmData.isEnabled
 
         alarmSwitch.setOnCheckedChangeListener { _, isChecked ->
+            Log.d("SetAlarm", "Switch checked: $isChecked for alarm: ${alarmData.name}")
             alarmData.isEnabled = isChecked
             updateAlarm(index, alarmData)
             if (isChecked) {
@@ -218,6 +220,7 @@ class SetAlarm : AppCompatActivity() {
             startActivityForResult(intent, REQUEST_CODE_MODIFY)
         }
     }
+
 
     private fun checkExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -269,6 +272,7 @@ class SetAlarm : AppCompatActivity() {
     }
 
     private fun cancelAlarm(alarmData: AlarmData) {
+        Log.d("SetAlarm", "Cancelling alarm: ${alarmData.name}")
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
