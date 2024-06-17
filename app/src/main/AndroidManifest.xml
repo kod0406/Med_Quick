@@ -57,9 +57,9 @@
             android:theme="@style/AppTheme" />
 
         <activity
-            android:name=".Intro"
+            android:name=".Med_Quick"
             android:exported="true"
-            android:label="@string/title_activity_intro"
+            android:label="med quick"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

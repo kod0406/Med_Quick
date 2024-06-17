@@ -44,6 +44,7 @@ class SetAlarm_Modify : AppCompatActivity() {
             val resultIntent = Intent().apply {
                 putExtra("ALARM_INDEX", alarmIndex)
             }
+            Toast.makeText(this, "알람이 삭제되었습니다", Toast.LENGTH_SHORT).show()
             setResult(Activity.RESULT_OK, resultIntent)
             finish()
         }
