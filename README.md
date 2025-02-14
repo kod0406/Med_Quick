@@ -99,7 +99,7 @@
 <img src="https://github.com/user-attachments/assets/690fbf35-d406-4ca3-a9d9-356400e3c71d" width="30%">
 </div>
 <br>
-- 약품을 추가하고 캘린더에 복약 표시를 하면 메인화면에 적용되어 나타납니다.
+- 약품을 추가하고, 캘린더에 복약 표시를 하면 메인화면에 적용되어 나타납니다.
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/4c2992ed-0aea-4e7b-a486-85dd53046a4f" width="30%">
