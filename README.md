@@ -38,8 +38,13 @@
     2. 위험 약물 조합 사전 경고 기능
     3. 발생 가능한 부작용 정보 제공 및 주의사항 안내
 
+<br>
 
-## 3. 개발 환경  
+## 3. 개발 기간
+⏳ **개발 기간** 
+2024-05-11 ~ 2024-06-25
+
+## 4. 개발 환경  
 
 📌 **Backend**  
 - Kotlin 2.0.0
@@ -57,3 +62,16 @@
 
 <br>
 
+## 4. 스토리보드
+
+<div align="center">
+<img src="https://github.com/user-attachments/assets/2ffa2d70-eec3-412e-a050-acb60da490a0" width="30%">
+<img src="https://github.com/user-attachments/assets/083c1436-835a-4991-a2cb-b3e261ebd5a8" width="30%">
+<img src="https://github.com/user-attachments/assets/49cc6490-edae-40a9-a1b3-6385884b0da6" width="30%">
+<img src="https://github.com/user-attachments/assets/9b146dde-3379-46e0-9f1b-a40f454f508f" width="30%">
+<img src="https://github.com/user-attachments/assets/dcf314ac-28d7-47d5-957a-4e2a740d4767" width="30%">
+<img src="https://github.com/user-attachments/assets/690fbf35-d406-4ca3-a9d9-356400e3c71d" width="30%">
+<img src="https://github.com/user-attachments/assets/4c2992ed-0aea-4e7b-a486-85dd53046a4f" width="30%">
+<img src="https://github.com/user-attachments/assets/3251f8bb-646b-462e-b626-50ba6115203e" width="30%">
+<img src="https://github.com/user-attachments/assets/18436b67-1ea6-44fe-86fa-d2c36973debf" width="30%">
+</div>
