@@ -2,7 +2,7 @@
 ## 0. 만든이
 <div align="center">
 
-| ![김재현](https://github.com/kod0406.png) |
+| <img src="https://github.com/kod0406.png" width="70%"> |
 | --- |
 | [김재현](https://github.com/kod0406) |
 
@@ -66,12 +66,54 @@
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/2ffa2d70-eec3-412e-a050-acb60da490a0" width="30%">
+</div>
+
+메인 화면입니다. 약품 검색과 캘린더 기능을 선택할 수 있습니다.
+
+<div align="center">
 <img src="https://github.com/user-attachments/assets/083c1436-835a-4991-a2cb-b3e261ebd5a8" width="30%">
+</div>
+
+약품 검색 화면입니다. 원하는 약품을 검색할 수 있습니다.
+
+<div align="center">
 <img src="https://github.com/user-attachments/assets/49cc6490-edae-40a9-a1b3-6385884b0da6" width="30%">
+</div>
+
+검색한 약품의 상세 정보를 확인할 수 있습니다.
+
+<div align="center">
 <img src="https://github.com/user-attachments/assets/9b146dde-3379-46e0-9f1b-a40f454f508f" width="30%">
+</div>
+
+캘린더 화면입니다. 약품 복용 일정을 관리할 수 있습니다.
+
+<div align="center">
 <img src="https://github.com/user-attachments/assets/dcf314ac-28d7-47d5-957a-4e2a740d4767" width="30%">
+</div>
+
+복용할 약품의 시간을 설정하는 화면입니다.
+
+<div align="center">
 <img src="https://github.com/user-attachments/assets/690fbf35-d406-4ca3-a9d9-356400e3c71d" width="30%">
+</div>
+
+약품 복용 현황을 확인할 수 있는 화면입니다.
+
+<div align="center">
 <img src="https://github.com/user-attachments/assets/4c2992ed-0aea-4e7b-a486-85dd53046a4f" width="30%">
+</div>
+
+알림 설정 화면입니다.
+
+<div align="center">
 <img src="https://github.com/user-attachments/assets/3251f8bb-646b-462e-b626-50ba6115203e" width="30%">
+</div>
+
+약물 간의 상호작용을 확인할 수 있는 화면입니다.
+
+<div align="center">
 <img src="https://github.com/user-attachments/assets/18436b67-1ea6-44fe-86fa-d2c36973debf" width="30%">
 </div>
+
+앱의 설정을 관리하는 화면입니다.
